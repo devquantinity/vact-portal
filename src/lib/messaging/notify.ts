@@ -27,7 +27,7 @@ export function staffRequestLink(companyId: string, requestId: string): string {
 export async function sendInvite(
   user: { id: string; name: string; email: string; phone: string | null; role: "ADMIN" | "STAFF" | "CLIENT" },
   rawToken: string,
-  options: { isReset?: boolean } = {},
+  options: { isReset?: boolean; companyId?: string | null } = {},
 ) {
   const settings = await getSettings();
   const link = setPasswordLink(rawToken);
@@ -43,6 +43,7 @@ export async function sendInvite(
   const email = await sendEmailMessage({
     kind,
     userId: user.id,
+    companyId: options.companyId ?? null,
     to: user.email,
     subject: rendered.subject,
     html: rendered.html,
@@ -53,6 +54,7 @@ export async function sendInvite(
     whatsapp = await sendWhatsAppMessage({
       kind,
       userId: user.id,
+      companyId: options.companyId ?? null,
       to: user.phone,
       clientName: user.name,
       body: options.isReset

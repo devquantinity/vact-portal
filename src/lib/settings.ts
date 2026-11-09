@@ -57,3 +57,13 @@ export async function getSetting<T = unknown>(key: string): Promise<T | null> {
 export async function setSetting(key: string, value: Prisma.InputJsonValue) {
   await prisma.setting.upsert({ where: { key }, update: { value }, create: { key, value } });
 }
+
+export const WORKER_STALE_MS = 3 * 60 * 1000;
+
+/** When the worker last ticked, and whether that is recent enough to call it alive. */
+export async function workerHeartbeat(now: Date = new Date()): Promise<{ lastTickDate: Date | null; workerAlive: boolean }> {
+  const lastTick = await getSetting<string>("workerLastTick");
+  const lastTickDate = lastTick ? new Date(lastTick) : null;
+  const workerAlive = lastTickDate ? now.getTime() - lastTickDate.getTime() < WORKER_STALE_MS : false;
+  return { lastTickDate, workerAlive };
+}
