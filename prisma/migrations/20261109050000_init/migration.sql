@@ -39,6 +39,7 @@ CREATE TABLE "User" (
     "id" TEXT NOT NULL,
     "name" TEXT NOT NULL,
     "email" TEXT NOT NULL,
+    "notificationEmail" TEXT,
     "passwordHash" TEXT,
     "phone" TEXT,
     "role" "Role" NOT NULL,

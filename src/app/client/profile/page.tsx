@@ -23,7 +23,7 @@ export default async function ClientProfilePage() {
           <DetailList
             items={[
               { label: "Name", value: me.name },
-              { label: "Email", value: me.email },
+              { label: "Email", value: me.notificationEmail && me.notificationEmail !== me.email ? `${me.notificationEmail} (sign in with ${me.email})` : me.email },
               { label: "WhatsApp", value: me.phone ? formatPhone(me.phone) : "Not on file" },
               { label: "Companies", value: companies.map((c) => c.name).join(", ") || "None linked" },
             ]}

@@ -13,7 +13,7 @@ import {
   requestCreatedEmail,
   uploadReceivedEmail,
 } from "@/emails/templates";
-import { appUrl, requestLink, staffRequestLink } from "./notify";
+import { appUrl, emailFor, requestLink, staffRequestLink } from "./notify";
 import { sendEmailMessage, sendWhatsAppMessage } from "./send";
 
 const requestInclude = {
@@ -85,7 +85,7 @@ export async function sendTemplatedToContacts(
               link,
               staffName: vars.staff_name,
             });
-      logs.push(await sendEmailMessage({ ...common, to: contact.email, subject: rendered.subject, html: rendered.html, text: rendered.text }));
+      logs.push(await sendEmailMessage({ ...common, to: emailFor(contact), subject: rendered.subject, html: rendered.html, text: rendered.text }));
     }
   }
   return logs;
@@ -116,7 +116,7 @@ export async function notifyChangesRequested(requestId: string, comment: string,
         staffName: reviewerName,
         link,
       });
-      await sendEmailMessage({ ...common, to: contact.email, subject: rendered.subject, html: rendered.html, text: rendered.text });
+      await sendEmailMessage({ ...common, to: emailFor(contact), subject: rendered.subject, html: rendered.html, text: rendered.text });
     }
     if (channels.includes("WHATSAPP") && contact.phone) {
       await sendWhatsAppMessage({
@@ -148,7 +148,7 @@ export async function notifyApproved(requestId: string, reviewerName: string) {
         staffName: reviewerName,
         link,
       });
-      await sendEmailMessage({ ...common, to: contact.email, subject: rendered.subject, html: rendered.html, text: rendered.text });
+      await sendEmailMessage({ ...common, to: emailFor(contact), subject: rendered.subject, html: rendered.html, text: rendered.text });
     }
     if (channels.includes("WHATSAPP") && contact.phone) {
       await sendWhatsAppMessage({
@@ -188,7 +188,7 @@ export async function notifyUploadReceived(requestId: string, uploadedByName: st
       userId: staff.id,
       companyId: request.companyId,
       requestId: request.id,
-      to: staff.email,
+      to: emailFor(staff),
       subject: rendered.subject,
       html: rendered.html,
       text: rendered.text,
@@ -221,7 +221,7 @@ export async function notifyEscalation(request: RequestForMessaging, remindersSe
       userId: staff.id,
       companyId: request.companyId,
       requestId: request.id,
-      to: staff.email,
+      to: emailFor(staff),
       subject: rendered.subject,
       html: rendered.html,
       text: rendered.text,

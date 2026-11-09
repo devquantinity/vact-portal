@@ -9,7 +9,7 @@ import { requireRole } from "@/lib/auth/require";
 import { emptyToNull, fail, parseForm, succeed, type ActionState } from "@/lib/action-utils";
 import { findUnknownPlaceholders, renderTemplate, sampleVars } from "@/lib/templates/render";
 import { getSettings } from "@/lib/settings";
-import { appUrl } from "@/lib/messaging/notify";
+import { appUrl, emailFor } from "@/lib/messaging/notify";
 import { sendEmailMessage, sendWhatsAppMessage } from "@/lib/messaging/send";
 import { testEmail } from "@/emails/templates";
 import { FIRM_NAME } from "@/lib/env";
@@ -142,7 +142,7 @@ export async function sendTestMessageAction(
     const log = await sendEmailMessage({
       kind: "TEST",
       userId: actor.id,
-      to: actor.email,
+      to: emailFor(actor),
       subject: rendered.subject,
       html: rendered.html,
       text: rendered.text,
@@ -150,7 +150,7 @@ export async function sendTestMessageAction(
     results.email =
       log.status === "FAILED"
         ? `Email failed: ${log.errorMessage ?? log.errorCode ?? "unknown error"}`
-        : `Email ${log.simulated ? "simulated" : "sent"} to ${actor.email}.`;
+        : `Email ${log.simulated ? "simulated" : "sent"} to ${emailFor(actor)}.`;
   }
   await audit(actor.id, "message.test_sent", "ReminderType", "test", results);
   const failed = Object.values(results).some((r) => r.includes("failed"));

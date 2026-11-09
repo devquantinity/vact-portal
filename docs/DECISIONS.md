@@ -23,3 +23,6 @@ Small choices made while building, where the spec left room. Larger questions we
 | 17 | A late or out-of-order provider status never downgrades a message (a `sent` after `delivered` is ignored); `failed` always wins unless the message was already read | Meta can deliver status events out of order. |
 | 18 | A REPEAT chain continues even when one send fails (not when it is skipped for lack of a contact) | A transient provider error should not silently end the chasing. |
 | 19 | `POST /api/cron/tick` accepts an admin session or `Authorization: Bearer $CRON_SECRET` | The UI button and any external scheduler use the same route. |
+| 20 | `User.notificationEmail` added (seed only) | The demo login must stay `client@vact.demo` while live emails need to reach the developer's real inbox (Resend's test sender only delivers to the account owner). All sending goes through `emailFor(user)`. |
+| 21 | Seed data is relative to today | `pnpm db:reset` on any day gives the same picture: overdue by 3–20 days, due in 3–30 days, two jobs due one minute ago. |
+| 22 | `ALLOWED_DEV_ORIGINS` env for `allowedDevOrigins` | Next 16 blocks cross-origin dev requests; needed to open the dev server from a phone on the LAN or through ngrok. |

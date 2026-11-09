@@ -97,6 +97,8 @@ model User {
   id              String     @id @default(cuid())
   name            String
   email           String     @unique
+  /// Where notifications go when different from the login email (demo client only)
+  notificationEmail String?
   passwordHash    String?
   /// E.164, e.g. +60123456789
   phone           String?

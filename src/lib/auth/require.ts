@@ -8,6 +8,7 @@ export type SessionUser = {
   id: string;
   name: string;
   email: string;
+  notificationEmail: string | null;
   phone: string | null;
   role: Role;
 };
@@ -41,10 +42,10 @@ export const getSessionUser = cache(async (): Promise<SessionUser | null> => {
   if (!session) return null;
   const user = await prisma.user.findUnique({
     where: { id: session.sub },
-    select: { id: true, name: true, email: true, phone: true, role: true, status: true },
+    select: { id: true, name: true, email: true, notificationEmail: true, phone: true, role: true, status: true },
   });
   if (!user || user.status !== "ACTIVE") return null;
-  return { id: user.id, name: user.name, email: user.email, phone: user.phone, role: user.role };
+  return { id: user.id, name: user.name, email: user.email, notificationEmail: user.notificationEmail, phone: user.phone, role: user.role };
 });
 
 /** For pages and server actions: redirects to /login when signed out. */

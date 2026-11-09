@@ -4,6 +4,11 @@ import { INVITE_TTL_HOURS } from "@/lib/auth/tokens";
 import { inviteEmail } from "@/emails/templates";
 import { sendEmailMessage, sendWhatsAppMessage } from "./send";
 
+/** The address notifications go to: the login email unless a separate notification email is set. */
+export function emailFor(user: { email: string; notificationEmail?: string | null }): string {
+  return user.notificationEmail?.trim() || user.email;
+}
+
 export function appUrl(): string {
   return env().APP_URL.replace(/\/$/, "");
 }
@@ -25,7 +30,7 @@ export function staffRequestLink(companyId: string, requestId: string): string {
  * Emails the set-password link; also sends it by WhatsApp to client contacts with a phone number.
  */
 export async function sendInvite(
-  user: { id: string; name: string; email: string; phone: string | null; role: "ADMIN" | "STAFF" | "CLIENT" },
+  user: { id: string; name: string; email: string; notificationEmail?: string | null; phone: string | null; role: "ADMIN" | "STAFF" | "CLIENT" },
   rawToken: string,
   options: { isReset?: boolean; companyId?: string | null } = {},
 ) {
@@ -44,7 +49,7 @@ export async function sendInvite(
     kind,
     userId: user.id,
     companyId: options.companyId ?? null,
-    to: user.email,
+    to: emailFor(user),
     subject: rendered.subject,
     html: rendered.html,
     text: rendered.text,
