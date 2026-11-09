@@ -21,6 +21,7 @@ export default async function StaffCompanyPage(props: PageProps<"/staff/companie
       viewer={viewer}
       basePath={`/staff/companies/${id}`}
       requestsBasePath={`/staff/companies/${id}`}
+      openRequestId={typeof sp.request === "string" ? sp.request : undefined}
     />
   );
 }

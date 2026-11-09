@@ -18,3 +18,4 @@ Small choices made while building, where the spec left room. Larger questions we
 | 12 | Simulated email (no `RESEND_API_KEY`) also progresses to delivered/read like simulated WhatsApp | Keeps the demo coherent when neither provider is configured. |
 | 13 | Due dates are `DATE` columns interpreted in Asia/Kuala_Lumpur | "Overdue" is a calendar question for the firm, not a UTC instant. |
 | 14 | Initial migration SQL written to match the Prisma schema | Equivalent to `prisma migrate dev --name init`; later schema changes use `pnpm db:migrate` as normal. |
+| 15 | No automatic reminders while a request is in CHANGES_REQUESTED | The spec cancels jobs when a request leaves PENDING and only sends for PENDING requests; the change-request notification itself tells the client what to do, and staff see it under "Action needed". |

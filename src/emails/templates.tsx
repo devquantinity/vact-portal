@@ -129,7 +129,7 @@ export function changesRequestedEmail(
         accepted:
       </P>
       <InfoBox rows={[{ label: "Comment from V ACT", value: p.comment }]} />
-      <P>Please upload a corrected version through the portal. Reminders will continue until the document is received.</P>
+      <P>Please upload a corrected version through the portal so we can complete the filing.</P>
     </EmailLayout>,
   );
 }

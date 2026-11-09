@@ -16,10 +16,11 @@ export default async function AdminCompanyPage(props: PageProps<"/admin/companie
   return (
     <CompanyDetail
       companyId={id}
-      tab={parseCompanyTab(sp.tab)}
+      tab={sp.request ? "requests" : parseCompanyTab(sp.tab)}
       viewer={viewer}
       basePath={`/admin/companies/${id}`}
       requestsBasePath={`/staff/companies/${id}`}
+      openRequestId={typeof sp.request === "string" ? sp.request : undefined}
     />
   );
 }

@@ -20,6 +20,8 @@ import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@
 import { CompanyForm } from "@/components/admin/company-form";
 import { ContactsPanel } from "./contacts-panel";
 import { MessageTimeline } from "@/components/messages/message-timeline";
+import { RequestPanel } from "@/components/requests/request-panel";
+import { loadRequestDetail } from "@/lib/requests/detail";
 
 const TABS = ["overview", "contacts", "requests", "documents", "messages", "escalations"] as const;
 export type CompanyTab = (typeof TABS)[number];
@@ -34,6 +36,7 @@ export async function CompanyDetail({
   viewer,
   basePath,
   requestsBasePath,
+  openRequestId,
 }: {
   companyId: string;
   tab: CompanyTab;
@@ -41,6 +44,8 @@ export async function CompanyDetail({
   basePath: string;
   /** Where "open request" links go (staff request view). */
   requestsBasePath: string;
+  /** When set, the request panel opens on top of the page. */
+  openRequestId?: string;
 }) {
   const company = await prisma.company.findUnique({
     where: { id: companyId },
@@ -94,9 +99,13 @@ export async function CompanyDetail({
     : null;
 
   const hrefFor = (key: string) => `${basePath}?tab=${key}`;
+  const openRequest = openRequestId ? await loadRequestDetail(openRequestId, viewer.id, now) : null;
 
   return (
     <>
+      {openRequest && openRequest.company.id === company.id ? (
+        <RequestPanel key={openRequest.id} request={openRequest} closeHref={`${basePath}?tab=requests`} />
+      ) : null}
       <PageHeader
         title={
           <span className="flex flex-wrap items-center gap-3">

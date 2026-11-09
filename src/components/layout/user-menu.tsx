@@ -41,7 +41,7 @@ export function UserMenu({
           {initials(user.name)}
         </span>
         <span className="min-w-0 flex-1">
-          <span className={dark ? "block truncate text-sm font-medium text-white" : "block truncate text-sm font-medium max-w-[140px]"}>
+          <span className={dark ? "block truncate text-sm font-medium text-white" : "block truncate text-sm font-medium text-foreground max-w-[140px]"}>
             {user.name}
           </span>
           {dark ? <span className="block truncate text-xs text-sidebar-muted">{ROLE_LABEL[user.role] ?? user.role}</span> : null}
