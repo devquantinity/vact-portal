@@ -19,3 +19,7 @@ Small choices made while building, where the spec left room. Larger questions we
 | 13 | Due dates are `DATE` columns interpreted in Asia/Kuala_Lumpur | "Overdue" is a calendar question for the firm, not a UTC instant. |
 | 14 | Initial migration SQL written to match the Prisma schema | Equivalent to `prisma migrate dev --name init`; later schema changes use `pnpm db:migrate` as normal. |
 | 15 | No automatic reminders while a request is in CHANGES_REQUESTED | The spec cancels jobs when a request leaves PENDING and only sends for PENDING requests; the change-request notification itself tells the client what to do, and staff see it under "Action needed". |
+| 16 | Webhook signature checks are skipped only when the matching secret env var is empty | Lets the demo run without ngrok; with `WHATSAPP_APP_SECRET` / `RESEND_WEBHOOK_SECRET` set, unsigned or tampered calls get 401. |
+| 17 | A late or out-of-order provider status never downgrades a message (a `sent` after `delivered` is ignored); `failed` always wins unless the message was already read | Meta can deliver status events out of order. |
+| 18 | A REPEAT chain continues even when one send fails (not when it is skipped for lack of a contact) | A transient provider error should not silently end the chasing. |
+| 19 | `POST /api/cron/tick` accepts an admin session or `Authorization: Bearer $CRON_SECRET` | The UI button and any external scheduler use the same route. |
