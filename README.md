@@ -1,36 +1,32 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+# V ACT Client Portal
 
-## Getting Started
+Client document collection and reminder portal for **V ACT Management Services Sdn Bhd**, built by Quantinity.
 
-First, run the development server:
+Clients upload the documents V ACT asks for through their own login and always see what is still missing. Staff
+review, approve or request changes, and can upload on a client's behalf. Reminders go out by WhatsApp (Meta Cloud
+API) and email (Resend) on rules the admin defines, stop automatically when the client uploads, and every message is
+logged as sent, delivered and read.
+
+> Demo build. Runs on the developer's Mac only; see `DEMO-SCRIPT.md` for the walkthrough and `docs/DECISIONS.md`
+> for the small calls made along the way. Hosting comes after V ACT approves.
+
+## Stack
+
+Next.js 16 (App Router, TypeScript strict, Server Actions + Route Handlers) · PostgreSQL 16 + Prisma 7 ·
+Tailwind CSS v4 + shadcn/ui · Resend + React Email · WhatsApp Cloud API · Vitest · pnpm · Node 20 LTS.
+
+## Run it locally
 
 ```bash
-npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
+docker compose up -d db      # Postgres 16 on localhost:5432 (named volume)
+cp .env.example .env         # then fill in the values you have
+pnpm install
+pnpm db:reset                # drop, migrate, seed in one go (idempotent seed)
+pnpm dev:all                 # web on http://localhost:3000 + reminder worker
 ```
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+Demo logins (all `Demo1234!`): `admin@vact.demo`, `aisyah@vact.demo`, `daniel@vact.demo`, `client@vact.demo`.
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+Useful scripts: `pnpm typecheck`, `pnpm lint`, `pnpm test`, `pnpm db:seed`, `pnpm db:migrate`, `pnpm db:studio`.
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
-
-## Learn More
-
-To learn more about Next.js, take a look at the following resources:
-
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
-
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
-
-## Deploy on Vercel
-
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
-
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+_(Setup notes for the Meta test number, Resend and the webhook options are added in Phase 4.)_

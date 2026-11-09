@@ -1,26 +1,97 @@
 @import "tailwindcss";
+@import "tw-animate-css";
+
+@custom-variant dark (&:is(.dark *));
 
 :root {
-  --background: #ffffff;
-  --foreground: #171717;
+  /* Brand */
+  --brand-blue: #29a3e0;
+  --brand-navy: #0f1f3d;
+  --brand-navy-soft: #16294f;
+
+  --background: #f7f9fb;
+  --foreground: #0f1f3d;
+  --card: #ffffff;
+  --card-foreground: #0f1f3d;
+  --popover: #ffffff;
+  --popover-foreground: #0f1f3d;
+  --primary: #29a3e0;
+  --primary-foreground: #ffffff;
+  --secondary: #e9eef5;
+  --secondary-foreground: #0f1f3d;
+  --muted: #eef2f6;
+  --muted-foreground: #5b6b85;
+  --accent: #e6f4fb;
+  --accent-foreground: #0f1f3d;
+  --destructive: #dc2626;
+  --success: #059669;
+  --warning: #d97706;
+  --border: #dde3ec;
+  --input: #cfd7e3;
+  --ring: #29a3e0;
+  --radius: 0.5rem;
+
+  --sidebar: #0f1f3d;
+  --sidebar-foreground: #dbe4f3;
+  --sidebar-muted: #8ea0bf;
+  --sidebar-accent: #16294f;
+  --sidebar-active: rgba(41, 163, 224, 0.18);
+  --sidebar-border: #1d3059;
 }
 
 @theme inline {
+  --font-sans: "Inter Variable", "Inter", ui-sans-serif, system-ui, -apple-system, "Segoe UI", sans-serif;
+
   --color-background: var(--background);
   --color-foreground: var(--foreground);
-  --font-sans: var(--font-geist-sans);
-  --font-mono: var(--font-geist-mono);
+  --color-card: var(--card);
+  --color-card-foreground: var(--card-foreground);
+  --color-popover: var(--popover);
+  --color-popover-foreground: var(--popover-foreground);
+  --color-primary: var(--primary);
+  --color-primary-foreground: var(--primary-foreground);
+  --color-secondary: var(--secondary);
+  --color-secondary-foreground: var(--secondary-foreground);
+  --color-muted: var(--muted);
+  --color-muted-foreground: var(--muted-foreground);
+  --color-accent: var(--accent);
+  --color-accent-foreground: var(--accent-foreground);
+  --color-destructive: var(--destructive);
+  --color-success: var(--success);
+  --color-warning: var(--warning);
+  --color-border: var(--border);
+  --color-input: var(--input);
+  --color-ring: var(--ring);
+
+  --color-brand: var(--brand-blue);
+  --color-navy: var(--brand-navy);
+  --color-navy-soft: var(--brand-navy-soft);
+
+  --color-sidebar: var(--sidebar);
+  --color-sidebar-foreground: var(--sidebar-foreground);
+  --color-sidebar-muted: var(--sidebar-muted);
+  --color-sidebar-accent: var(--sidebar-accent);
+  --color-sidebar-active: var(--sidebar-active);
+  --color-sidebar-border: var(--sidebar-border);
+
+  --radius-sm: calc(var(--radius) - 4px);
+  --radius-md: calc(var(--radius) - 2px);
+  --radius-lg: var(--radius);
+  --radius-xl: calc(var(--radius) + 4px);
 }
 
-@media (prefers-color-scheme: dark) {
-  :root {
-    --background: #0a0a0a;
-    --foreground: #ededed;
+@layer base {
+  * {
+    @apply border-border outline-ring/50;
   }
-}
-
-body {
-  background: var(--background);
-  color: var(--foreground);
-  font-family: Arial, Helvetica, sans-serif;
+  html {
+    color-scheme: light;
+  }
+  body {
+    @apply bg-background text-foreground font-sans antialiased;
+    font-feature-settings: "cv11", "ss01";
+  }
+  a {
+    @apply underline-offset-4;
+  }
 }

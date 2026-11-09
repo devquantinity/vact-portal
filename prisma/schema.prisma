@@ -1,0 +1,336 @@
+// V ACT Client Portal — data model
+// Dates are stored in UTC. Scheduling and display happen in Asia/Kuala_Lumpur (see src/lib/dates.ts).
+
+generator client {
+  provider = "prisma-client"
+  output   = "../src/generated/prisma"
+}
+
+datasource db {
+  provider = "postgresql"
+}
+
+enum Role {
+  ADMIN
+  STAFF
+  CLIENT
+}
+
+enum UserStatus {
+  INVITED
+  ACTIVE
+  DISABLED
+}
+
+enum CompanyStatus {
+  ACTIVE
+  INACTIVE
+}
+
+/// Channel a reminder type uses.
+enum ReminderChannel {
+  WHATSAPP
+  EMAIL
+  BOTH
+}
+
+/// A single delivery channel (one job / one message).
+enum Channel {
+  WHATSAPP
+  EMAIL
+}
+
+enum RequestStatus {
+  PENDING
+  UPLOADED
+  CHANGES_REQUESTED
+  APPROVED
+  CANCELLED
+}
+
+enum UploaderRole {
+  CLIENT
+  STAFF
+}
+
+enum ReviewStatus {
+  AWAITING
+  APPROVED
+  CHANGES_REQUESTED
+}
+
+enum JobKind {
+  BEFORE_DUE
+  REPEAT
+}
+
+enum JobStatus {
+  SCHEDULED
+  SENT
+  SKIPPED
+  FAILED
+  CANCELLED
+}
+
+enum MessageStatus {
+  QUEUED
+  SENT
+  DELIVERED
+  READ
+  FAILED
+}
+
+/// What a message was about. Added so the delivery log can label rows.
+enum MessageKind {
+  INVITE
+  PASSWORD_RESET
+  NEW_REQUEST
+  REMINDER
+  CHANGES_REQUESTED
+  APPROVED
+  ESCALATION
+  UPLOAD_RECEIVED
+  TEST
+}
+
+model User {
+  id              String     @id @default(cuid())
+  name            String
+  email           String     @unique
+  passwordHash    String?
+  /// E.164, e.g. +60123456789
+  phone           String?
+  role            Role
+  status          UserStatus @default(INVITED)
+  /// SHA-256 hash of the set-password / reset token sent to the user
+  inviteToken     String?    @unique
+  inviteExpiresAt DateTime?
+  lastLoginAt     DateTime?
+  createdAt       DateTime   @default(now())
+  updatedAt       DateTime   @updatedAt
+
+  companyContacts   CompanyContact[]
+  assignedCompanies Company[]         @relation("AssignedStaff")
+  createdRequests   DocumentRequest[] @relation("RequestCreator")
+  uploadedDocuments Document[]        @relation("Uploader")
+  reviewedDocuments Document[]        @relation("Reviewer")
+  messages          MessageLog[]
+  escalations       Escalation[]
+  auditLogs         AuditLog[]
+
+  @@index([role, status])
+}
+
+model Company {
+  id                String        @id @default(cuid())
+  name              String
+  /// New 12-digit SSM number, optional old format in brackets, e.g. "202301012345 (1512345-X)"
+  ssmNumber         String        @unique
+  incorporationDate DateTime?     @db.Date
+  /// Financial year end as "MM-DD"
+  financialYearEnd  String?
+  assignedStaffId   String?
+  assignedStaff     User?         @relation("AssignedStaff", fields: [assignedStaffId], references: [id], onDelete: SetNull)
+  status            CompanyStatus @default(ACTIVE)
+  notes             String?
+  createdAt         DateTime      @default(now())
+  updatedAt         DateTime      @updatedAt
+
+  contacts    CompanyContact[]
+  requests    DocumentRequest[]
+  messages    MessageLog[]
+
+  @@index([assignedStaffId])
+  @@index([status])
+}
+
+model CompanyContact {
+  companyId String
+  userId    String
+  isPrimary Boolean @default(false)
+  company   Company @relation(fields: [companyId], references: [id], onDelete: Cascade)
+  user      User    @relation(fields: [userId], references: [id], onDelete: Cascade)
+  createdAt DateTime @default(now())
+
+  @@id([companyId, userId])
+  @@index([userId])
+}
+
+model DocumentType {
+  id                 String   @id @default(cuid())
+  name               String   @unique
+  description        String?
+  /// e.g. ["pdf","jpg","png","docx","xlsx"]
+  acceptedExtensions String[]
+  maxSizeMb          Int      @default(10)
+  allowMultipleFiles Boolean  @default(false)
+  active             Boolean  @default(true)
+  sortOrder          Int      @default(0)
+  createdAt          DateTime @default(now())
+  updatedAt          DateTime @updatedAt
+
+  requests DocumentRequest[]
+}
+
+model ReminderType {
+  id              String          @id @default(cuid())
+  name            String          @unique
+  description     String?
+  channel         ReminderChannel
+  /// e.g. [14, 7, 1]
+  daysBefore      Int[]
+  /// null = do not repeat after the due date
+  repeatEveryDays Int?
+  /// number of sent reminders with no upload before staff is notified
+  escalateAfter   Int?
+  whatsappBody    String
+  emailSubject    String
+  emailBody       String
+  active          Boolean         @default(true)
+  createdAt       DateTime        @default(now())
+  updatedAt       DateTime        @updatedAt
+
+  requests DocumentRequest[]
+}
+
+model DocumentRequest {
+  id             String        @id @default(cuid())
+  companyId      String
+  company        Company       @relation(fields: [companyId], references: [id], onDelete: Cascade)
+  documentTypeId String
+  documentType   DocumentType  @relation(fields: [documentTypeId], references: [id])
+  reminderTypeId String
+  reminderType   ReminderType  @relation(fields: [reminderTypeId], references: [id])
+  /// Calendar date in Asia/Kuala_Lumpur. "Overdue" is computed: PENDING && dueDate < today.
+  dueDate        DateTime      @db.Date
+  status         RequestStatus @default(PENDING)
+  /// Free text shown to the client
+  instructions   String?
+  createdById    String
+  createdBy      User          @relation("RequestCreator", fields: [createdById], references: [id])
+  createdAt      DateTime      @default(now())
+  updatedAt      DateTime      @updatedAt
+  closedAt       DateTime?
+
+  documents   Document[]
+  jobs        ReminderJob[]
+  messages    MessageLog[]
+  escalations Escalation[]
+
+  @@index([companyId, status])
+  @@index([status, dueDate])
+}
+
+model Document {
+  id             String          @id @default(cuid())
+  requestId      String
+  request        DocumentRequest @relation(fields: [requestId], references: [id], onDelete: Cascade)
+  version        Int
+  originalName   String
+  storageKey     String
+  sizeBytes      Int
+  mimeType       String
+  uploadedById   String
+  uploadedBy     User            @relation("Uploader", fields: [uploadedById], references: [id])
+  uploadedByRole UploaderRole
+  uploadedAt     DateTime        @default(now())
+  reviewStatus   ReviewStatus    @default(AWAITING)
+  reviewComment  String?
+  reviewedById   String?
+  reviewedBy     User?           @relation("Reviewer", fields: [reviewedById], references: [id])
+  reviewedAt     DateTime?
+
+  @@unique([requestId, version])
+  @@index([reviewStatus])
+}
+
+model ReminderJob {
+  id           String          @id @default(cuid())
+  requestId    String
+  request      DocumentRequest @relation(fields: [requestId], references: [id], onDelete: Cascade)
+  channel      Channel
+  scheduledFor DateTime
+  kind         JobKind
+  status       JobStatus       @default(SCHEDULED)
+  attempts     Int             @default(0)
+  lastError    String?
+  sentAt       DateTime?
+  /// Set while a tick is processing the job, so two ticks never send the same job twice
+  lockedAt     DateTime?
+  createdAt    DateTime        @default(now())
+  updatedAt    DateTime        @updatedAt
+
+  messages MessageLog[]
+
+  @@index([status, scheduledFor])
+  @@index([requestId, status])
+}
+
+model MessageLog {
+  id                String           @id @default(cuid())
+  requestId         String?
+  request           DocumentRequest? @relation(fields: [requestId], references: [id], onDelete: SetNull)
+  companyId         String?
+  company           Company?         @relation(fields: [companyId], references: [id], onDelete: SetNull)
+  /// Recipient user, when known
+  userId            String?
+  user              User?            @relation(fields: [userId], references: [id], onDelete: SetNull)
+  jobId             String?
+  job               ReminderJob?     @relation(fields: [jobId], references: [id], onDelete: SetNull)
+  kind              MessageKind      @default(REMINDER)
+  channel           Channel
+  /// Phone (E.164) or email address
+  recipient         String
+  subject           String?
+  renderedBody      String
+  /// Meta wamid or Resend id (sim-<uuid> in simulate mode)
+  providerMessageId String?          @unique
+  simulated         Boolean          @default(false)
+  status            MessageStatus    @default(QUEUED)
+  errorCode         String?
+  errorMessage      String?
+  queuedAt          DateTime         @default(now())
+  sentAt            DateTime?
+  deliveredAt       DateTime?
+  readAt            DateTime?
+  failedAt          DateTime?
+
+  @@index([companyId, queuedAt])
+  @@index([status])
+  @@index([channel, queuedAt])
+}
+
+model Escalation {
+  id             String          @id @default(cuid())
+  requestId      String
+  request        DocumentRequest @relation(fields: [requestId], references: [id], onDelete: Cascade)
+  notifiedUserId String
+  notifiedUser   User            @relation(fields: [notifiedUserId], references: [id])
+  remindersSent  Int
+  createdAt      DateTime        @default(now())
+  acknowledgedAt DateTime?
+
+  @@index([notifiedUserId, acknowledgedAt])
+}
+
+model AuditLog {
+  id        String   @id @default(cuid())
+  actorId   String?
+  actor     User?    @relation(fields: [actorId], references: [id], onDelete: SetNull)
+  action    String
+  entity    String
+  entityId  String
+  meta      Json     @default("{}")
+  createdAt DateTime @default(now())
+
+  @@index([createdAt])
+  @@index([entity, entityId])
+}
+
+/// Key/value settings: brand, sendWindowStart "09:00", sendWindowEnd "18:00", skipWeekends true,
+/// timezone "Asia/Kuala_Lumpur", workerLastTick (heartbeat).
+model Setting {
+  key       String   @id
+  value     Json
+  updatedAt DateTime @updatedAt
+}
