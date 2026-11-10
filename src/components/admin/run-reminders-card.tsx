@@ -10,10 +10,24 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/com
 
 type TickSummary = { sent: number; skipped: number; failed: number; deferred: number; processed: number; simulatedAdvanced?: number };
 
-export function RunRemindersCard({ lastTick, workerAlive }: { lastTick: string | null; workerAlive: boolean }) {
+export function RunRemindersCard({
+  lastTick,
+  workerAlive,
+  intervalMinutes,
+  hosted,
+}: {
+  lastTick: string | null;
+  workerAlive: boolean;
+  /** Minutes between scheduler ticks (1 for the worker, 15 for a Vercel schedule on Hobby). */
+  intervalMinutes: number;
+  /** True on Vercel, where a schedule calls the tick route instead of the worker process. */
+  hosted: boolean;
+}) {
   const [pending, start] = useTransition();
   const [last, setLast] = useState<TickSummary | null>(null);
   const router = useRouter();
+  const every = intervalMinutes === 1 ? "every minute" : `every ${intervalMinutes} minutes`;
+  const runner = hosted ? "A Vercel schedule" : "The worker";
 
   function run() {
     start(async () => {
@@ -35,10 +49,11 @@ export function RunRemindersCard({ lastTick, workerAlive }: { lastTick: string |
       <CardHeader>
         <CardTitle className="flex items-center gap-2">
           Reminder scheduler
-          <Badge variant={workerAlive ? "approved" : "overdue"}>{workerAlive ? "Worker running" : "Worker not seen"}</Badge>
+          <Badge variant={workerAlive ? "approved" : "overdue"}>{workerAlive ? "Scheduler running" : "Scheduler not seen"}</Badge>
         </CardTitle>
         <CardDescription>
-          The worker runs every 60 seconds{lastTick ? ` (last tick ${lastTick})` : ""}. Run it now to send anything that is due without waiting.
+          {runner} runs the scheduler {every}
+          {lastTick ? ` (last run ${lastTick})` : ""}. Run it now to send anything that is due without waiting.
         </CardDescription>
       </CardHeader>
       <CardContent className="space-y-3">

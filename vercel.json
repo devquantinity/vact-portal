@@ -2,5 +2,11 @@
   "$schema": "https://openapi.vercel.sh/vercel.json",
   "regions": ["sin1"],
   "buildCommand": "pnpm prisma migrate deploy && pnpm build",
-  "crons": [{ "path": "/api/cron/tick", "schedule": "* * * * *" }]
+  "schedules": {
+    "reminder-tick": {
+      "schedule": "*/15 * * * *",
+      "path": "/api/cron/tick",
+      "requestMethod": "GET"
+    }
+  }
 }

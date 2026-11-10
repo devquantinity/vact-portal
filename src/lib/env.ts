@@ -14,6 +14,9 @@ const schema = z.object({
   BLOB_READ_WRITE_TOKEN: z.string().default(""),
   MAX_UPLOAD_MB: z.coerce.number().int().positive().optional(),
   CRON_SECRET: z.string().default(""),
+  // How often the scheduler is expected to tick: the worker every minute, Vercel Schedules every 15 on Hobby.
+  // Only drives the "scheduler not seen" warning; unset = 1 locally, 15 on Vercel.
+  TICK_INTERVAL_MINUTES: z.coerce.number().int().positive().optional(),
 
   WHATSAPP_MODE: z.enum(["live", "simulate"]).default("simulate"),
   GRAPH_API_VERSION: z.string().default("v24.0"),
@@ -39,14 +42,23 @@ export type Env = z.infer<typeof schema>;
 
 let cached: Env | null = null;
 
-export function env(): Env {
-  if (cached) return cached;
-  const parsed = schema.safeParse(process.env);
+/**
+ * Parses an environment. An empty value (`MAX_UPLOAD_MB=""`, as in .env.example) counts as unset, so optional
+ * variables keep their defaults instead of failing validation on "".
+ */
+export function parseEnv(source: Record<string, string | undefined>): Env {
+  const input = Object.fromEntries(Object.entries(source).filter(([, value]) => value !== undefined && value !== ""));
+  const parsed = schema.safeParse(input);
   if (!parsed.success) {
     const issues = parsed.error.issues.map((i) => `${i.path.join(".")}: ${i.message}`).join("; ");
     throw new Error(`Invalid environment: ${issues}. Copy .env.example to .env and fill it in.`);
   }
-  cached = parsed.data;
+  return parsed.data;
+}
+
+export function env(): Env {
+  if (cached) return cached;
+  cached = parseEnv(process.env);
   return cached;
 }
 

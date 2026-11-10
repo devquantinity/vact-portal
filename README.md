@@ -58,7 +58,9 @@ var, so the same code runs on a laptop today and on a server later.
 | `APP_URL` | Base URL used in links inside messages. `http://localhost:3000` on the laptop; the ngrok URL or `http://<Mac LAN IP>:3000` when a phone must open the links |
 | `SESSION_SECRET` | Signs the session cookie and download links (32+ random characters) |
 | `UPLOAD_DIR` | Where files are stored (`./uploads`, never served statically) |
-| `CRON_SECRET` | Bearer token for `POST /api/cron/tick` from outside the UI |
+| `CRON_SECRET` | Bearer token for `/api/cron/tick` from outside the UI (Vercel sends it on scheduled calls) |
+| `STORAGE_DRIVER`, `BLOB_READ_WRITE_TOKEN`, `MAX_UPLOAD_MB` | File storage: `local` (default) or `blob` (Vercel Blob; chosen automatically when the token is set), and an optional per-upload cap in MB |
+| `TICK_INTERVAL_MINUTES` | How often the scheduler is expected to tick (1 for the worker, 15 for the Vercel schedule); only drives the "Scheduler not seen" warning. Unset = 1 locally, 15 on Vercel |
 | `ALLOWED_DEV_ORIGINS` | Extra hosts allowed to open the dev server, e.g. `192.168.0.12,*.ngrok-free.app` |
 | `WHATSAPP_MODE` | `live` or `simulate` (see below) |
 | `GRAPH_API_VERSION`, `WHATSAPP_PHONE_NUMBER_ID`, `WHATSAPP_ACCESS_TOKEN`, `WHATSAPP_BUSINESS_ACCOUNT_ID` | Meta Cloud API credentials |
@@ -146,28 +148,35 @@ read ticks from the simulator. Switch to `live` for one real message to prove th
 
 Apart from Postgres and file storage the app is stateless, so it runs on Vercel with two swaps that are already in
 the code: a private **Vercel Blob** store replaces the local `uploads` folder (`STORAGE_DRIVER=blob`, picked
-automatically when `BLOB_READ_WRITE_TOKEN` is set), and **Vercel Cron** calls `GET /api/cron/tick` every minute
-instead of the worker process. `vercel.json` sets the Singapore region, the build command
-(`prisma migrate deploy && next build`) and the cron schedule.
+automatically when `BLOB_READ_WRITE_TOKEN` is set), and a **Vercel Schedule** calls `GET /api/cron/tick` every
+15 minutes instead of the worker process. `vercel.json` sets the Singapore region, the build command
+(`prisma migrate deploy && next build`) and the schedule.
 
 1. Push the repo to GitHub and import it in Vercel (**Add New → Project**). Framework preset Next.js, root `/`.
 2. Project → **Storage → Create Database → Neon** (Postgres, Singapore). Connecting it adds `DATABASE_URL`
    (pooled, used by the app) and `DATABASE_URL_UNPOOLED` (used for migrations).
 3. **Storage → Create → Blob**, access **private**, and tick *add a read-write token* so `BLOB_READ_WRITE_TOKEN` is set.
 4. **Settings → Environment Variables** (Production): `SESSION_SECRET`, `CRON_SECRET` (Vercel sends it as the bearer
-   token on cron calls), `APP_URL=https://<project>.vercel.app`, `MAX_UPLOAD_MB=4`, `EMAIL_FROM`, `RESEND_API_KEY`,
-   the `WHATSAPP_*` values, and the `SEED_*` logins you want.
+   token on scheduled calls), `APP_URL=https://<project>.vercel.app`, `MAX_UPLOAD_MB=4`, and optionally `EMAIL_FROM`,
+   `RESEND_API_KEY` and the `WHATSAPP_*` values. The `SEED_*` logins are not needed on Vercel (step 6 reads them
+   from the Mac).
 5. Deploy (push to `main`, or **Redeploy** after adding variables). The build applies the migrations.
 6. Seed from the Mac, in the repo folder:
-   `pnpm dlx vercel env pull .env.production.local --environment production` then
+   `pnpm dlx vercel env pull .env.production.local --environment production`, then append the `SEED_*` lines from
+   `.env` (`grep '^SEED_' .env >> .env.production.local`), then
    `SEED_ENV_FILE=.env.production.local pnpm db:seed` (sample files go into Blob).
 7. Webhooks now have permanent URLs: Meta → `https://<project>.vercel.app/api/webhooks/whatsapp`,
    Resend → `https://<project>.vercel.app/api/webhooks/resend`. No ngrok.
 
+Scheduling: the legacy Vercel *Cron Jobs* run at most once a day on Hobby, so `vercel.json` uses the newer
+**Schedules** (`schedules.reminder-tick`, `*/15 * * * *`, `requestMethod: GET`), which Hobby allows every 15 minutes
+with a 15-minute jitter — a reminder goes out within 30 minutes of its slot, and **Run reminders now** sends it at
+once. On Pro set the schedule to `* * * * *` for the same per-minute cadence as the worker. `TICK_INTERVAL_MINUTES`
+tells the Settings page what to expect; on Vercel it defaults to 15.
+
 Limits to know: Vercel functions accept request bodies up to 4.5 MB, hence `MAX_UPLOAD_MB=4` (the droplet build has
-no such cap; direct-to-Blob uploads lift it later). Per-minute cron needs the Pro plan; on Hobby set the schedule in
-`vercel.json` to daily and let a free pinger such as cron-job.org call the tick URL every minute with
-`Authorization: Bearer <CRON_SECRET>`. The login rate limiter is per function instance.
+no such cap; direct-to-Blob uploads lift it later). Schedules are in public beta. The login rate limiter is per
+function instance.
 
 ## How the reminder engine works
 

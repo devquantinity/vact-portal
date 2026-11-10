@@ -1,5 +1,5 @@
 import { prisma, type Prisma } from "@/lib/db";
-import { FIRM_SHORT, TIMEZONE } from "@/lib/env";
+import { env, FIRM_SHORT, TIMEZONE } from "@/lib/env";
 
 export type AppSettings = {
   brandName: string;
@@ -58,12 +58,24 @@ export async function setSetting(key: string, value: Prisma.InputJsonValue) {
   await prisma.setting.upsert({ where: { key }, update: { value }, create: { key, value } });
 }
 
-export const WORKER_STALE_MS = 3 * 60 * 1000;
+/** Minutes between scheduler ticks: the worker every minute, Vercel Schedules every 15 (the Hobby minimum). */
+export function tickIntervalMinutes(): number {
+  return env().TICK_INTERVAL_MINUTES ?? (process.env.VERCEL ? 15 : 1);
+}
 
-/** When the worker last ticked, and whether that is recent enough to call it alive. */
+/**
+ * How long without a tick before the scheduler counts as not running: two intervals plus one minute, so a
+ * 1-minute worker is stale after 3 minutes and a 15-minute Vercel schedule (which may start up to 15 minutes
+ * late on Hobby) after 31.
+ */
+export function workerStaleMs(intervalMinutes: number = tickIntervalMinutes()): number {
+  return (intervalMinutes * 2 + 1) * 60 * 1000;
+}
+
+/** When the scheduler last ticked, and whether that is recent enough to call it alive. */
 export async function workerHeartbeat(now: Date = new Date()): Promise<{ lastTickDate: Date | null; workerAlive: boolean }> {
   const lastTick = await getSetting<string>("workerLastTick");
   const lastTickDate = lastTick ? new Date(lastTick) : null;
-  const workerAlive = lastTickDate ? now.getTime() - lastTickDate.getTime() < WORKER_STALE_MS : false;
+  const workerAlive = lastTickDate ? now.getTime() - lastTickDate.getTime() < workerStaleMs() : false;
   return { lastTickDate, workerAlive };
 }

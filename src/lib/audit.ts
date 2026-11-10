@@ -19,6 +19,7 @@ export type AuditAction =
   | "reminder_type.changed"
   | "settings.changed"
   | "scheduler.manual_tick"
+  | "scheduler.tick"
   | "message.test_sent"
   | "escalation.acknowledged";
 

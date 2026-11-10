@@ -18,7 +18,13 @@ function hasCronSecret(req: NextRequest): boolean {
 async function runTick(via: "ui" | "secret" | "cron", actorId: string | null) {
   try {
     const summary = await tick(prismaTickStore);
-    await audit(actorId, "scheduler.manual_tick", "Scheduler", "tick", { ...summary, via });
+    // A manual run is always recorded; a scheduled one only when it did something, so an idle
+    // schedule does not add a row to the audit log every few minutes.
+    if (via !== "cron") {
+      await audit(actorId, "scheduler.manual_tick", "Scheduler", "tick", { ...summary, via });
+    } else if (summary.processed > 0 || summary.simulatedAdvanced > 0) {
+      await audit(null, "scheduler.tick", "Scheduler", "tick", { ...summary, via });
+    }
     return NextResponse.json(summary);
   } catch (err) {
     console.error("tick failed", err);
@@ -39,7 +45,7 @@ export async function POST(req: NextRequest) {
   return runTick(user ? "ui" : "secret", user?.id ?? null);
 }
 
-/** Vercel Cron (and other pingers) call GET with the bearer secret; the worker is not needed when hosted. */
+/** The Vercel schedule (and other pingers) call GET with the bearer secret; the worker is not needed when hosted. */
 export async function GET(req: NextRequest) {
   if (!hasCronSecret(req)) return NextResponse.json({ error: "Cron secret required" }, { status: 401 });
   return runTick("cron", null);

@@ -1,5 +1,5 @@
 import type { Metadata } from "next";
-import { getSettings, workerHeartbeat } from "@/lib/settings";
+import { getSettings, tickIntervalMinutes, workerHeartbeat } from "@/lib/settings";
 import { env } from "@/lib/env";
 import { emailMode } from "@/lib/messaging/email";
 import { whatsappMode } from "@/lib/messaging/whatsapp";
@@ -32,7 +32,12 @@ export default async function SettingsPage() {
           </CardContent>
         </Card>
         <div className="space-y-6">
-          <RunRemindersCard lastTick={lastTickDate ? formatDateTime(lastTickDate, "d MMM yyyy, HH:mm:ss") : null} workerAlive={workerAlive} />
+          <RunRemindersCard
+            lastTick={lastTickDate ? formatDateTime(lastTickDate, "d MMM yyyy, HH:mm:ss") : null}
+            workerAlive={workerAlive}
+            intervalMinutes={tickIntervalMinutes()}
+            hosted={Boolean(process.env.VERCEL)}
+          />
           <Card>
             <CardHeader>
               <CardTitle>Providers</CardTitle>
