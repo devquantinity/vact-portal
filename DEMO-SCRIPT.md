@@ -74,10 +74,11 @@ you set.
 
 ## 7:00 — Review queue, request changes, upload on behalf
 
-- **Review queue** → TechNova Solutions, Bank statements → **Review** → two files, previews side by side → **Request
-  changes** → comment "October statement is missing page 2" → **Send change request**.
+- **Review queue**: the waiting uploads are listed on the left and the oldest one is already open on the right, on the
+  same page. Click TechNova Solutions, Bank statements → two files with an inline preview → **Request changes** →
+  comment "October statement is missing page 2" → **Send change request**. The queue moves straight on to the next upload.
 - Window B (as Hafiz) is a different company, so just say: the TechNova director now sees that comment on his phone.
-- Back in the queue: Kedai Kopi Warisan, Management accounts was **uploaded by staff** (the client emailed it). Open,
+- Next in the list: Kedai Kopi Warisan, Management accounts was **uploaded by staff** (the client emailed it). Click it,
   show *(staff)* on the file, **Approve**. "Clients who will never log in are still covered."
 
 ## 8:00 — Run the scheduler live (Admin → Settings)
