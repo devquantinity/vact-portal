@@ -102,12 +102,3 @@ export async function openEscalations(scope: DashboardScope, limit = 25) {
     take: limit,
   });
 }
-
-export async function recentMessages(scope: DashboardScope, limit = 12) {
-  return prisma.messageLog.findMany({
-    where: scope.staffId ? { company: { assignedStaffId: scope.staffId } } : {},
-    include: { company: { select: { id: true, name: true } }, user: { select: { name: true } }, request: { select: { id: true, documentType: { select: { name: true } } } } },
-    orderBy: { queuedAt: "desc" },
-    take: limit,
-  });
-}

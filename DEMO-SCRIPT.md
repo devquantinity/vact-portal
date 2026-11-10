@@ -30,9 +30,9 @@ you set.
 ## 0:00 — The problem, in one screen (Admin dashboard)
 
 - Window A: sign in as `admin@vact.demo`.
-- Point at the cards: **5 overdue**, **5 awaiting review**, **93% delivered / 59% read**, **2 open escalations**.
-- Scroll to **Overdue requests**: "the portal already knows who is late, by how much, and how many reminders they
-  have had." Note Puncak Hijau: 4 reminders, number bounced, escalated to Daniel.
+- Point at the four numbers: **to review**, **overdue**, **escalated**, **due this week**. Each one jumps to its list.
+- Scroll to **Overdue**: "the portal already knows who is late and by how much." Under **Escalated**, Puncak Hijau:
+  reminders ignored, number bounced, Daniel alerted. The line at the bottom has the message stats and the delivery log.
 
 ## 1:30 — Rules the admin controls (Reminder types)
 

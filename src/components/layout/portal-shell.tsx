@@ -43,7 +43,7 @@ export function PortalShell({ user, brandName, children }: { user: User; brandNa
   return (
     <div className="flex min-h-screen">
       <aside className="hidden lg:flex w-64 shrink-0 flex-col fixed inset-y-0 left-0 z-30">{sidebar}</aside>
-      <div className="flex min-h-screen flex-1 flex-col lg:pl-64">
+      <div className="flex min-h-screen min-w-0 flex-1 flex-col lg:pl-64">
         <header className="lg:hidden sticky top-0 z-20 flex h-14 items-center gap-3 bg-sidebar px-3 text-white">
           <Sheet open={open} onOpenChange={setOpen}>
             <Button variant="ghost" size="icon" className="text-white hover:bg-sidebar-accent hover:text-white" onClick={() => setOpen(true)} aria-label="Open menu">

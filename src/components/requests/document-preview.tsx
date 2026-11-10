@@ -17,7 +17,7 @@ export function DocumentPreview({ documents, showUploader = true }: { documents:
   return (
     // Side by side only when the container is wide enough (the dialog); stacked in the review queue's column.
     <div className="@container">
-      <div className="grid gap-4 @4xl:grid-cols-[minmax(0,2fr)_minmax(0,3fr)]">
+      <div className="grid grid-cols-1 gap-4 @4xl:grid-cols-[minmax(0,2fr)_minmax(0,3fr)]">
         <ul className="space-y-2">
           {documents.map((d) => (
             <li key={d.id}>
