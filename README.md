@@ -40,8 +40,9 @@ Demo logins (password `Demo1234!` for all):
 | Client | `client@vact.demo` | Hafiz Trading Sdn Bhd (notifications go to `SEED_DEMO_EMAIL` / `SEED_DEMO_PHONE`) |
 | Client | `rosli@hamidholdings.demo` | A director linked to two companies (company switcher) |
 
-Other scripts: `pnpm typecheck`, `pnpm lint`, `pnpm test`, `pnpm db:seed` (idempotent), `pnpm db:migrate`,
-`pnpm db:studio`, `pnpm worker` (scheduler only).
+Other scripts: `pnpm typecheck`, `pnpm lint`, `pnpm test`, `pnpm db:seed` (idempotent, re-runnable), `pnpm db:migrate`,
+`pnpm db:studio`, `pnpm worker` (scheduler only). Prisma 7 no longer seeds after `migrate reset`, so `db:reset` runs
+`prisma db seed` explicitly.
 
 ### Environment variables
 

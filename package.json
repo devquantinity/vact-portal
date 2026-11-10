@@ -14,8 +14,8 @@
     "test:watch": "vitest",
     "db:migrate": "prisma migrate dev",
     "db:deploy": "prisma migrate deploy",
-    "db:seed": "tsx prisma/seed.ts",
-    "db:reset": "node -e \"require('fs').rmSync('uploads',{recursive:true,force:true})\" && prisma migrate reset --force",
+    "db:seed": "prisma db seed",
+    "db:reset": "node -e \"require('fs').rmSync('uploads',{recursive:true,force:true})\" && prisma migrate reset --force && prisma db seed",
     "db:studio": "prisma studio",
     "postinstall": "prisma generate"
   },
