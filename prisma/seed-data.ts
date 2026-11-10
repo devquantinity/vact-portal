@@ -1,7 +1,5 @@
 /** Static seed content shared by the seed script. Keep names stable: the seed upserts by them. */
 
-export const DEMO_PASSWORD = "Demo1234!";
-
 export const DOCUMENT_TYPES: {
   name: string;
   description: string;

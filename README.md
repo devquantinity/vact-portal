@@ -30,15 +30,18 @@ pnpm db:reset                # drop + migrate + seed, replayable any time
 pnpm dev:all                 # web on http://localhost:3000 and the reminder worker, side by side
 ```
 
-Demo logins (password `Demo1234!` for all):
+Demo logins come from `.env` (`SEED_PASSWORD`, `SEED_ADMIN_EMAIL`, `SEED_DEMO_EMAIL`); with the defaults they are:
 
 | Role | Email | Sees |
 |---|---|---|
-| Admin | `admin@vact.demo` | Everything: setup, delivery log, settings, audit log |
+| Admin | `admin@vact.demo` (`SEED_ADMIN_EMAIL`) | Everything: setup, delivery log, settings, audit log |
 | Staff | `aisyah@vact.demo` | Hafiz Trading, Nusantara Agro, Kedai Kopi Warisan, Bayu Logistik, Seri Mutiara |
 | Staff | `daniel@vact.demo` | TechNova, Lim & Tan, Puncak Hijau, Delima Fashion, Borneo Harvest |
-| Client | `client@vact.demo` | Hafiz Trading Sdn Bhd (notifications go to `SEED_DEMO_EMAIL` / `SEED_DEMO_PHONE`) |
+| Client | `client@vact.demo` (`SEED_DEMO_EMAIL`) | Hafiz Trading Sdn Bhd; WhatsApp goes to `SEED_DEMO_PHONE` |
 | Client | `rosli@hamidholdings.demo` | A director linked to two companies (company switcher) |
+
+Staff addresses follow the admin's domain (`SEED_ADMIN_EMAIL=admin@vact.com` gives `aisyah@vact.com`). Every seeded
+account uses `SEED_PASSWORD` (`Demo1234!` by default). Change any of these in `.env`, run `pnpm db:seed`, done.
 
 Other scripts: `pnpm typecheck`, `pnpm lint`, `pnpm test`, `pnpm db:seed` (idempotent, re-runnable), `pnpm db:migrate`,
 `pnpm db:studio`, `pnpm worker` (scheduler only). Prisma 7 no longer seeds after `migrate reset`, so `db:reset` runs
@@ -62,7 +65,7 @@ var, so the same code runs on a laptop today and on a server later.
 | `WHATSAPP_APP_SECRET`, `WHATSAPP_VERIFY_TOKEN` | Webhook signature check and verification handshake |
 | `WHATSAPP_TEMPLATE_NAME`, `WHATSAPP_TEMPLATE_LANGUAGE` | The approved utility template (`vact_reminder`, `en`) |
 | `RESEND_API_KEY`, `EMAIL_FROM`, `RESEND_WEBHOOK_SECRET` | Email sending and the Svix-signed status webhook |
-| `SEED_DEMO_PHONE`, `SEED_DEMO_EMAIL` | Your own verified WhatsApp number and inbox; the seed attaches them to `client@vact.demo` so live sends land on your phone |
+| `SEED_PASSWORD`, `SEED_ADMIN_EMAIL`, `SEED_DEMO_EMAIL`, `SEED_DEMO_PHONE` | Demo logins: one password for every seeded account, the admin address (staff follow its domain), and the demo client's login/inbox and WhatsApp number |
 
 ### Simulated vs live
 
@@ -114,9 +117,8 @@ see the two options below.
 
 1. Create an account at [resend.com](https://resend.com) → **API Keys → Create API key** → `RESEND_API_KEY`.
 2. Until a domain is verified, keep `EMAIL_FROM="V ACT Client Portal <onboarding@resend.dev>"`. Resend then only
-   delivers to **the email address of your own Resend account**, so put that address in `SEED_DEMO_EMAIL` (the seed
-   attaches it to `client@vact.demo` as the notification address; the login stays `client@vact.demo`) and use it for
-   the admin account if you want to receive staff emails too.
+   delivers to **the email address of your own Resend account**, so put that address in `SEED_DEMO_EMAIL` (it becomes
+   the demo client's login and inbox) and in `SEED_ADMIN_EMAIL` if you want to receive the staff-side emails too.
 3. After V ACT approves, verify `v-act.com.my` in Resend and switch `EMAIL_FROM` to `portal@v-act.com.my` (or the
    Quantinity domain in the meantime).
 4. For delivery receipts: **Webhooks → Add endpoint** → `https://<your ngrok host>/api/webhooks/resend`, events

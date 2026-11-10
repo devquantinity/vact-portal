@@ -13,7 +13,7 @@ import { composeTemplateMessage } from "../src/lib/messaging/whatsapp";
 import { renderTemplate } from "../src/lib/templates/render";
 import { FIRM_NAME } from "../src/lib/env";
 import { formatPhone } from "../src/lib/phone";
-import { DEMO_PASSWORD, DOCUMENT_TYPES, REMINDER_TYPES } from "./seed-data";
+import { DOCUMENT_TYPES, REMINDER_TYPES } from "./seed-data";
 import { sampleJpg, samplePdf } from "./seed-files";
 
 const prisma = new PrismaClient({ adapter: new PrismaPg({ connectionString: process.env.DATABASE_URL! }) });
@@ -26,7 +26,11 @@ const minutesAfter = (d: Date, m: number) => new Date(d.getTime() + m * 60_000);
 const APP_URL = (process.env.APP_URL ?? "http://localhost:3000").replace(/\/$/, "");
 const UPLOAD_DIR = path.resolve(process.cwd(), process.env.UPLOAD_DIR ?? "./uploads");
 const DEMO_PHONE = process.env.SEED_DEMO_PHONE || "+60123456789";
-const DEMO_EMAIL = process.env.SEED_DEMO_EMAIL || "client@vact.demo";
+// Demo logins come from .env so the same seed works with real addresses on demo day.
+const PASSWORD = process.env.SEED_PASSWORD || "Demo1234!";
+const ADMIN_EMAIL = (process.env.SEED_ADMIN_EMAIL || "admin@vact.demo").trim().toLowerCase();
+const STAFF_DOMAIN = ADMIN_EMAIL.split("@")[1] || "vact.demo";
+const DEMO_EMAIL = (process.env.SEED_DEMO_EMAIL || "client@vact.demo").trim().toLowerCase();
 
 // ---------------------------------------------------------------------------------------------
 // Static definitions
@@ -134,7 +138,7 @@ function statusTimestamps(status: MessageStatus, sentAt: Date) {
 
 async function main() {
   const started = Date.now();
-  const passwordHash = await hash(DEMO_PASSWORD, { memoryCost: 19456, timeCost: 2, parallelism: 1 });
+  const passwordHash = await hash(PASSWORD, { memoryCost: 19456, timeCost: 2, parallelism: 1 });
 
   // --- Settings -------------------------------------------------------------------------------
   for (const [key, value] of Object.entries(DEFAULT_SETTINGS)) {
@@ -144,19 +148,19 @@ async function main() {
   // --- Internal users -------------------------------------------------------------------------
   const internal = {
     admin: await prisma.user.upsert({
-      where: { email: "admin@vact.demo" },
-      update: { name: "Nurul Hasanah", role: "ADMIN", status: "ACTIVE", passwordHash },
-      create: { id: "seed-user-admin", email: "admin@vact.demo", name: "Nurul Hasanah", role: "ADMIN", status: "ACTIVE", passwordHash, phone: "+60122001000", lastLoginAt: at(0, "08:45") },
+      where: { id: "seed-user-admin" },
+      update: { email: ADMIN_EMAIL, name: "Nurul Hasanah", role: "ADMIN", status: "ACTIVE", passwordHash },
+      create: { id: "seed-user-admin", email: ADMIN_EMAIL, name: "Nurul Hasanah", role: "ADMIN", status: "ACTIVE", passwordHash, phone: "+60122001000", lastLoginAt: at(0, "08:45") },
     }),
     aisyah: await prisma.user.upsert({
-      where: { email: "aisyah@vact.demo" },
-      update: { name: "Aisyah Rahman", role: "STAFF", status: "ACTIVE", passwordHash },
-      create: { id: "seed-user-aisyah", email: "aisyah@vact.demo", name: "Aisyah Rahman", role: "STAFF", status: "ACTIVE", passwordHash, phone: "+60122001001", lastLoginAt: at(0, "09:10") },
+      where: { id: "seed-user-aisyah" },
+      update: { email: `aisyah@${STAFF_DOMAIN}`, name: "Aisyah Rahman", role: "STAFF", status: "ACTIVE", passwordHash },
+      create: { id: "seed-user-aisyah", email: `aisyah@${STAFF_DOMAIN}`, name: "Aisyah Rahman", role: "STAFF", status: "ACTIVE", passwordHash, phone: "+60122001001", lastLoginAt: at(0, "09:10") },
     }),
     daniel: await prisma.user.upsert({
-      where: { email: "daniel@vact.demo" },
-      update: { name: "Daniel Lim", role: "STAFF", status: "ACTIVE", passwordHash },
-      create: { id: "seed-user-daniel", email: "daniel@vact.demo", name: "Daniel Lim", role: "STAFF", status: "ACTIVE", passwordHash, phone: "+60122001002", lastLoginAt: at(-1, "17:20") },
+      where: { id: "seed-user-daniel" },
+      update: { email: `daniel@${STAFF_DOMAIN}`, name: "Daniel Lim", role: "STAFF", status: "ACTIVE", passwordHash },
+      create: { id: "seed-user-daniel", email: `daniel@${STAFF_DOMAIN}`, name: "Daniel Lim", role: "STAFF", status: "ACTIVE", passwordHash, phone: "+60122001002", lastLoginAt: at(-1, "17:20") },
     }),
   };
   const staffByKey: Record<"aisyah" | "daniel", Staff> = { aisyah: internal.aisyah, daniel: internal.daniel };
@@ -188,11 +192,11 @@ async function main() {
       create: { id: `seed-co-${c.key}`, name: c.name, ssmNumber: c.ssm, incorporationDate: dateOnlyToDb(c.inc), financialYearEnd: c.fye, assignedStaffId: staff.id, status: "ACTIVE", notes: c.notes ?? null },
     });
     const isDemo = c.key === "hafiz";
-    const notificationEmail = isDemo && DEMO_EMAIL !== c.contact.email ? DEMO_EMAIL : null;
+    const email = isDemo ? DEMO_EMAIL : c.contact.email;
     const user = await prisma.user.upsert({
-      where: { email: c.contact.email },
-      update: { name: c.contact.name, phone: c.contact.phone, notificationEmail, role: "CLIENT", status: "ACTIVE", passwordHash },
-      create: { id: `seed-user-${c.contact.key}`, email: c.contact.email, name: c.contact.name, phone: c.contact.phone, notificationEmail, role: "CLIENT", status: "ACTIVE", passwordHash, lastLoginAt: isDemo ? at(-1, "20:05") : null },
+      where: { id: `seed-user-${c.contact.key}` },
+      update: { email, name: c.contact.name, phone: c.contact.phone, notificationEmail: null, role: "CLIENT", status: "ACTIVE", passwordHash },
+      create: { id: `seed-user-${c.contact.key}`, email, name: c.contact.name, phone: c.contact.phone, role: "CLIENT", status: "ACTIVE", passwordHash, lastLoginAt: isDemo ? at(-1, "20:05") : null },
     });
     await prisma.companyContact.upsert({
       where: { companyId_userId: { companyId: company.id, userId: user.id } },
@@ -202,8 +206,8 @@ async function main() {
     companies.set(c.key, { id: company.id, name: company.name, staff, contacts: [{ id: user.id, name: user.name, email: user.email, notificationEmail: user.notificationEmail, phone: c.contact.phone }] });
   }
   const director = await prisma.user.upsert({
-    where: { email: DIRECTOR.email },
-    update: { name: DIRECTOR.name, phone: DIRECTOR.phone, role: "CLIENT", status: "ACTIVE", passwordHash },
+    where: { id: `seed-user-${DIRECTOR.key}` },
+    update: { email: DIRECTOR.email, name: DIRECTOR.name, phone: DIRECTOR.phone, role: "CLIENT", status: "ACTIVE", passwordHash },
     create: { id: `seed-user-${DIRECTOR.key}`, email: DIRECTOR.email, name: DIRECTOR.name, phone: DIRECTOR.phone, role: "CLIENT", status: "ACTIVE", passwordHash },
   });
   for (const key of DIRECTOR.companies) {
@@ -513,7 +517,7 @@ async function main() {
       `Seeded ${COMPANIES.length} companies, ${COMPANIES.length + 1} clients, ${REQUESTS.length} requests,`,
       `${jobCount} reminder jobs, ${messageCount} messages, ${escalationCount} escalations, ${fileCount} files, ${audits.length} audit rows`,
       `in ${Date.now() - started}ms.`,
-      `Demo client: client@vact.demo (notifications → ${DEMO_EMAIL} / ${DEMO_PHONE}).`,
+      `Logins: admin ${ADMIN_EMAIL}, staff aisyah@${STAFF_DOMAIN} and daniel@${STAFF_DOMAIN}, demo client ${DEMO_EMAIL} (WhatsApp ${DEMO_PHONE}); password ${PASSWORD}.`,
     ].join(" "),
   );
 }

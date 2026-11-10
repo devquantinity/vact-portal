@@ -12,7 +12,8 @@ Goal: prove the four things V ACT cares about, in this order.
 In the repo folder `~/side-project/quantinity/vact-portal`:
 
 1. Check `.env`: `WHATSAPP_MODE=live`, Meta credentials filled, `SEED_DEMO_PHONE` = your WhatsApp number,
-   `SEED_DEMO_EMAIL` = your inbox, `RESEND_API_KEY` set. (Fallback: `WHATSAPP_MODE=simulate` and the demo still works.)
+   `SEED_DEMO_EMAIL` = the client login/inbox, `SEED_ADMIN_EMAIL` and `SEED_PASSWORD` as you want them,
+   `RESEND_API_KEY` set. (Fallback: `WHATSAPP_MODE=simulate` and the demo still works.)
 2. Optional, for real delivered/read ticks: second terminal `ngrok http 3000`, paste the URL into the Meta webhook
    settings (README → Webhooks), add the host to `ALLOWED_DEV_ORIGINS` and set `APP_URL` to the ngrok URL so links in
    WhatsApp open on your phone.
@@ -22,7 +23,9 @@ In the repo folder `~/side-project/quantinity/vact-portal`:
    private/incognito window, narrowed to phone width (or Chrome DevTools device mode, iPhone 14).
 6. Keep your phone on the table with WhatsApp open.
 
-Passwords are all `Demo1234!`.
+Every login uses the password in `SEED_PASSWORD`; the admin is `SEED_ADMIN_EMAIL`, the client is `SEED_DEMO_EMAIL`,
+staff are `aisyah@` and `daniel@` the admin's domain. Below, `admin@vact.demo` and `client@vact.demo` stand for whatever
+you set.
 
 ## 0:00 — The problem, in one screen (Admin dashboard)
 
