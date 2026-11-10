@@ -15,6 +15,7 @@
     "db:migrate": "prisma migrate dev",
     "db:deploy": "prisma migrate deploy",
     "db:seed": "prisma db seed",
+    "db:seed:if-empty": "tsx prisma/seed-if-empty.ts",
     "db:reset": "node -e \"require('fs').rmSync('uploads',{recursive:true,force:true})\" && prisma migrate reset --force && prisma db seed",
     "db:studio": "prisma studio",
     "postinstall": "prisma generate"

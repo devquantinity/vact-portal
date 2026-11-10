@@ -513,7 +513,7 @@ async function main() {
       `Seeded ${COMPANIES.length} companies, ${COMPANIES.length + 1} clients, ${REQUESTS.length} requests,`,
       `${jobCount} reminder jobs, ${messageCount} messages, ${escalationCount} escalations, ${fileCount} files (${storageDriver()} storage), ${audits.length} audit rows`,
       `in ${Date.now() - started}ms.`,
-      `Logins: admin ${ADMIN_EMAIL}, staff aisyah@${STAFF_DOMAIN} and daniel@${STAFF_DOMAIN}, demo client ${DEMO_EMAIL} (WhatsApp ${DEMO_PHONE}); password ${PASSWORD}.`,
+      `Logins: admin ${ADMIN_EMAIL}, staff aisyah@${STAFF_DOMAIN} and daniel@${STAFF_DOMAIN}, demo client ${DEMO_EMAIL} (WhatsApp ${DEMO_PHONE}); password ${process.env.VERCEL ? "from SEED_PASSWORD" : PASSWORD}.`,
     ].join(" "),
   );
 }

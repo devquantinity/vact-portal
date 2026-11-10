@@ -150,21 +150,24 @@ Apart from Postgres and file storage the app is stateless, so it runs on Vercel 
 the code: a private **Vercel Blob** store replaces the local `uploads` folder (`STORAGE_DRIVER=blob`, picked
 automatically when `BLOB_READ_WRITE_TOKEN` is set), and a **Vercel Schedule** calls `GET /api/cron/tick` every
 15 minutes instead of the worker process. `vercel.json` sets the Singapore region, the build command
-(`prisma migrate deploy && next build`) and the schedule.
+(`prisma migrate deploy`, then the seed if the database is still empty, then `next build`) and the schedule.
 
 1. Push the repo to GitHub and import it in Vercel (**Add New → Project**). Framework preset Next.js, root `/`.
 2. Project → **Storage → Create Database → Neon** (Postgres, Singapore). Connecting it adds `DATABASE_URL`
    (pooled, used by the app) and `DATABASE_URL_UNPOOLED` (used for migrations).
 3. **Storage → Create → Blob**, access **private**, and tick *add a read-write token* so `BLOB_READ_WRITE_TOKEN` is set.
 4. **Settings → Environment Variables** (Production): `SESSION_SECRET`, `CRON_SECRET` (Vercel sends it as the bearer
-   token on scheduled calls), `APP_URL=https://<project>.vercel.app`, `MAX_UPLOAD_MB=4`, and optionally `EMAIL_FROM`,
-   `RESEND_API_KEY` and the `WHATSAPP_*` values. The `SEED_*` logins are not needed on Vercel (step 6 reads them
-   from the Mac).
-5. Deploy (push to `main`, or **Redeploy** after adding variables). The build applies the migrations.
-6. Seed from the Mac, in the repo folder:
-   `pnpm dlx vercel env pull .env.production.local --environment production`, then append the `SEED_*` lines from
-   `.env` (`grep '^SEED_' .env >> .env.production.local`), then
-   `SEED_ENV_FILE=.env.production.local pnpm db:seed` (sample files go into Blob).
+   token on scheduled calls), `APP_URL=https://<project>.vercel.app`, `MAX_UPLOAD_MB=4`, the `SEED_*` logins you
+   want (`SEED_PASSWORD`, `SEED_ADMIN_EMAIL`, `SEED_DEMO_EMAIL`, `SEED_DEMO_PHONE`), and optionally `EMAIL_FROM`,
+   `RESEND_API_KEY` and the `WHATSAPP_*` values.
+5. Deploy (push to `main`, or **Redeploy** after adding variables). The build applies the migrations and, when the
+   database has no users yet, runs the seed (`pnpm db:seed:if-empty`; sample files go into Blob). Later builds
+   skip the seed, so live data survives deploys.
+6. To start the demo data over: open the Neon database in Vercel (**Storage → vact-portal-db → Open in Neon**),
+   reset the `public` schema or delete and recreate the database, then **Redeploy**. Or seed from the Mac:
+   `pnpm dlx vercel env pull .env.production.local --environment production`, then
+   `grep -E '^(SEED_|SESSION_SECRET)' .env >> .env.production.local`, then
+   `SEED_ENV_FILE=.env.production.local pnpm db:reset`.
 7. Webhooks now have permanent URLs: Meta → `https://<project>.vercel.app/api/webhooks/whatsapp`,
    Resend → `https://<project>.vercel.app/api/webhooks/resend`. No ngrok.
 

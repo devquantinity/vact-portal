@@ -1,7 +1,7 @@
 {
   "$schema": "https://openapi.vercel.sh/vercel.json",
   "regions": ["sin1"],
-  "buildCommand": "pnpm prisma migrate deploy && pnpm build",
+  "buildCommand": "pnpm prisma migrate deploy && pnpm db:seed:if-empty && pnpm build",
   "schedules": {
     "reminder-tick": {
       "schedule": "*/15 * * * *",
