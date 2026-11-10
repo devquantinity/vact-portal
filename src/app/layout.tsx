@@ -10,7 +10,6 @@ export const metadata: Metadata = {
     template: "%s · V ACT Client Portal",
   },
   description: "Document collection and reminders for V ACT Management Services clients.",
-  icons: { icon: "/logo.png" },
 };
 
 export const viewport: Viewport = {
