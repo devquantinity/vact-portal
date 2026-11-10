@@ -20,8 +20,6 @@ import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@
 import { CompanyForm } from "@/components/admin/company-form";
 import { ContactsPanel } from "./contacts-panel";
 import { MessageTimeline } from "@/components/messages/message-timeline";
-import { RequestPanel } from "@/components/requests/request-panel";
-import { loadRequestDetail } from "@/lib/requests/detail";
 
 const TABS = ["overview", "contacts", "requests", "documents", "messages", "escalations"] as const;
 export type CompanyTab = (typeof TABS)[number];
@@ -35,17 +33,11 @@ export async function CompanyDetail({
   tab,
   viewer,
   basePath,
-  requestsBasePath,
-  openRequestId,
 }: {
   companyId: string;
   tab: CompanyTab;
   viewer: SessionUser;
   basePath: string;
-  /** Where "open request" links go (staff request view). */
-  requestsBasePath: string;
-  /** When set, the request panel opens on top of the page. */
-  openRequestId?: string;
 }) {
   const company = await prisma.company.findUnique({
     where: { id: companyId },
@@ -99,13 +91,9 @@ export async function CompanyDetail({
     : null;
 
   const hrefFor = (key: string) => `${basePath}?tab=${key}`;
-  const openRequest = openRequestId ? await loadRequestDetail(openRequestId, viewer.id, now) : null;
 
   return (
     <>
-      {openRequest && openRequest.company.id === company.id ? (
-        <RequestPanel key={openRequest.id} request={openRequest} closeHref={`${basePath}?tab=requests`} />
-      ) : null}
       <PageHeader
         title={
           <span className="flex flex-wrap items-center gap-3">
@@ -262,7 +250,7 @@ export async function CompanyDetail({
                               <TableCell className="text-sm text-muted-foreground">{r.reminderType.name}</TableCell>
                               <TableCell>
                                 <Button asChild variant="ghost" size="sm">
-                                  <Link href={`${requestsBasePath}?request=${r.id}`}>Open</Link>
+                                  <Link href={`/staff/requests/${r.id}`}>Open</Link>
                                 </Button>
                               </TableCell>
                             </TableRow>
@@ -312,7 +300,7 @@ export async function CompanyDetail({
                       </TableCell>
                       <TableCell>
                         <Button asChild variant="ghost" size="sm">
-                          <Link href={`${requestsBasePath}?request=${d.requestId}`}>Open</Link>
+                          <Link href={`/staff/requests/${d.requestId}`}>Open</Link>
                         </Button>
                       </TableCell>
                     </TableRow>

@@ -43,7 +43,7 @@ export async function createRequestAction(_prev: ActionState<{ requestId: string
   });
   revalidatePath(`/staff/companies/${d.companyId}`);
   revalidatePath(`/admin/companies/${d.companyId}`);
-  redirect(`/staff/companies/${d.companyId}?request=${request.id}&created=1`);
+  redirect(`/staff/requests/${request.id}?created=1`);
 }
 
 const reviewSchema = z.object({

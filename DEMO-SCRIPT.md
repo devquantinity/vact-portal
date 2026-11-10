@@ -53,8 +53,8 @@ you set.
 - Show the **Reminder schedule** panel: "WhatsApp + email on these dates, then every 3 days until uploaded. Staff alerted
   after 3." Click **Confirm and notify client**.
 - Your phone buzzes again: the client just got the new-request WhatsApp; the email is in your inbox.
-- The request panel opens. **Reminders** tab: the exact jobs that were just scheduled. **Messages** tab: the two
-  notifications, status *Sent*.
+- The request's own page opens. The blue box says who we are waiting for and when the next reminder goes out;
+  **Reminders** lists the exact dates just planned; **Messages** shows the two notifications (click one to read it).
 
 ## 4:30 — The client side (Window B, phone width)
 
@@ -68,15 +68,16 @@ you set.
 
 ## 6:00 — Reminders stop by themselves (Window A)
 
-- Open **Companies → Hafiz Trading → Requests** → open **Annual return information** → **Reminders** tab: every
-  remaining job is now **Cancelled**. "The moment he uploaded, the chasing stopped. The WhatsApp bot could not do this."
-- Still in the panel: **Files** → preview the PDF inline → **Approve and notify client**. Phone buzzes: approved message.
+- Open **Companies → Hafiz Trading → Requests** → **Open** on **Annual return information**. The box at the top now
+  says "1 file ready for your review", and under **Reminders** every remaining one shows *Not needed*. "The moment he
+  uploaded, the chasing stopped. The WhatsApp bot could not do this."
+- Same page: the PDF preview is right there → **Approve** → **Approve and tell the client**. Phone buzzes: approved message.
 
 ## 7:00 — Review queue, request changes, upload on behalf
 
 - **Review queue**: the waiting uploads are listed on the left and the oldest one is already open on the right, on the
-  same page. Click TechNova Solutions, Bank statements → two files with an inline preview → **Request changes** →
-  comment "October statement is missing page 2" → **Send change request**. The queue moves straight on to the next upload.
+  same page. Click TechNova Solutions, Bank statements → two files with an inline preview → **Ask for changes** →
+  comment "October statement is missing page 2" → **Send to the client**. The queue moves straight on to the next upload.
 - Window B (as Hafiz) is a different company, so just say: the TechNova director now sees that comment on his phone.
 - Next in the list: Kedai Kopi Warisan, Management accounts was **uploaded by staff** (the client emailed it). Click it,
   show *(staff)* on the file, **Approve**. "Clients who will never log in are still covered."

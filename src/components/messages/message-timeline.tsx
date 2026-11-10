@@ -39,16 +39,6 @@ function fmt(iso: string | null) {
 
 export function MessageTimeline({ message, trigger }: { message: MessageView; trigger?: React.ReactNode }) {
   const [open, setOpen] = useState(false);
-  const steps = [
-    { key: "queued", label: "Queued", at: message.queuedAt, icon: Clock, done: true },
-    { key: "sent", label: "Sent", at: message.sentAt, icon: Send, done: !!message.sentAt },
-    ...(message.status === "FAILED" || message.failedAt
-      ? [{ key: "failed", label: "Failed", at: message.failedAt, icon: XCircle, done: true, failed: true }]
-      : [
-          { key: "delivered", label: "Delivered", at: message.deliveredAt, icon: Check, done: !!message.deliveredAt },
-          { key: "read", label: message.channel === "EMAIL" ? "Opened" : "Read", at: message.readAt, icon: message.channel === "EMAIL" ? Eye : CheckCheck, done: !!message.readAt },
-        ]),
-  ];
   return (
     <>
       <span onClick={() => setOpen(true)}>
@@ -71,52 +61,71 @@ export function MessageTimeline({ message, trigger }: { message: MessageView; tr
               {message.providerMessageId ? <span className="block font-mono text-[11px] break-all">id {message.providerMessageId}</span> : null}
             </DialogDescription>
           </DialogHeader>
-          <div className="grid gap-5 sm:grid-cols-[minmax(0,1fr)_200px]">
-            <div className="space-y-2">
-              {message.subject ? <p className="text-sm font-semibold">{message.subject}</p> : null}
-              <div
-                className={cn(
-                  "whitespace-pre-wrap rounded-lg border p-3 text-sm leading-relaxed",
-                  message.channel === "WHATSAPP" ? "bg-[#e7ffdb] border-[#cde9c0]" : "bg-muted/40",
-                )}
-              >
-                {message.renderedBody}
-              </div>
-              {message.errorMessage ? (
-                <p className="text-sm text-destructive">
-                  <span className="font-medium">Error {message.errorCode ? `(${message.errorCode})` : ""}:</span> {message.errorMessage}
-                </p>
-              ) : null}
-            </div>
-            <ol className="space-y-3">
-              {steps.map((s) => {
-                const Icon = s.icon;
-                return (
-                  <li key={s.key} className="flex gap-3">
-                    <span
-                      className={cn(
-                        "mt-0.5 flex size-6 shrink-0 items-center justify-center rounded-full border",
-                        s.done ? ("failed" in s && s.failed ? "bg-red-100 border-red-200 text-red-700" : "bg-emerald-100 border-emerald-200 text-emerald-700") : "bg-muted text-muted-foreground",
-                      )}
-                    >
-                      <Icon className="size-3.5" />
-                    </span>
-                    <div>
-                      <p className={cn("text-sm font-medium", !s.done && "text-muted-foreground")}>{s.label}</p>
-                      <p className="text-xs text-muted-foreground">{fmt(s.at) ?? (s.done ? "" : "Not yet")}</p>
-                    </div>
-                  </li>
-                );
-              })}
-            </ol>
-          </div>
-          {message.simulated ? (
-            <Badge variant="outline" className="w-fit text-muted-foreground">
-              Simulated: no message left this machine (provider not configured or in simulate mode)
-            </Badge>
-          ) : null}
+          <MessageDetails message={message} />
         </DialogContent>
       </Dialog>
     </>
+  );
+}
+
+/** Message text, delivery steps and the simulated note. Shown in the dialog above and inline on the request page. */
+export function MessageDetails({ message }: { message: MessageView }) {
+  const steps = [
+    { key: "queued", label: "Queued", at: message.queuedAt, icon: Clock, done: true },
+    { key: "sent", label: "Sent", at: message.sentAt, icon: Send, done: !!message.sentAt },
+    ...(message.status === "FAILED" || message.failedAt
+      ? [{ key: "failed", label: "Failed", at: message.failedAt, icon: XCircle, done: true, failed: true }]
+      : [
+          { key: "delivered", label: "Delivered", at: message.deliveredAt, icon: Check, done: !!message.deliveredAt },
+          { key: "read", label: message.channel === "EMAIL" ? "Opened" : "Read", at: message.readAt, icon: message.channel === "EMAIL" ? Eye : CheckCheck, done: !!message.readAt },
+        ]),
+  ];
+  return (
+    <div className="space-y-4">
+      <div className="grid gap-5 sm:grid-cols-[minmax(0,1fr)_200px]">
+        <div className="space-y-2">
+          {message.subject ? <p className="text-sm font-semibold">{message.subject}</p> : null}
+          <div
+            className={cn(
+              "whitespace-pre-wrap rounded-lg border p-3 text-sm leading-relaxed",
+              message.channel === "WHATSAPP" ? "bg-[#e7ffdb] border-[#cde9c0]" : "bg-muted/40",
+            )}
+          >
+            {message.renderedBody}
+          </div>
+          {message.errorMessage ? (
+            <p className="text-sm text-destructive">
+              <span className="font-medium">Error {message.errorCode ? `(${message.errorCode})` : ""}:</span> {message.errorMessage}
+            </p>
+          ) : null}
+        </div>
+        <ol className="space-y-3">
+          {steps.map((s) => {
+            const Icon = s.icon;
+            return (
+              <li key={s.key} className="flex gap-3">
+                <span
+                  className={cn(
+                    "mt-0.5 flex size-6 shrink-0 items-center justify-center rounded-full border",
+                    s.done ? ("failed" in s && s.failed ? "bg-red-100 border-red-200 text-red-700" : "bg-emerald-100 border-emerald-200 text-emerald-700") : "bg-muted text-muted-foreground",
+                  )}
+                >
+                  <Icon className="size-3.5" />
+                </span>
+                <div>
+                  <p className={cn("text-sm font-medium", !s.done && "text-muted-foreground")}>{s.label}</p>
+                  <p className="text-xs text-muted-foreground">{fmt(s.at) ?? (s.done ? "" : "Not yet")}</p>
+                </div>
+              </li>
+            );
+          })}
+        </ol>
+      </div>
+      {message.simulated ? (
+        <Badge variant="outline" className="w-fit text-muted-foreground">
+          Simulated: no message left this machine (provider not configured or in simulate mode)
+        </Badge>
+      ) : null}
+    </div>
   );
 }

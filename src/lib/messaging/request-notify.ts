@@ -181,7 +181,7 @@ export async function notifyUploadReceived(requestId: string, uploadedByName: st
       document: request.documentType.name,
       uploadedBy: uploadedByName,
       fileNames: fileNames.join(", "),
-      link: staffRequestLink(request.companyId, request.id),
+      link: staffRequestLink(request.id),
     });
     await sendEmailMessage({
       kind: "UPLOAD_RECEIVED",
@@ -214,7 +214,7 @@ export async function notifyEscalation(request: RequestForMessaging, remindersSe
       daysLeft: describeDaysLeft(daysLeft(request.dueDate, now)),
       remindersSent,
       contacts: contacts || "No contacts on file",
-      link: staffRequestLink(request.companyId, request.id),
+      link: staffRequestLink(request.id),
     });
     await sendEmailMessage({
       kind: "ESCALATION",

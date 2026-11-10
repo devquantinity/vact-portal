@@ -1,4 +1,5 @@
 import type { Metadata } from "next";
+import { redirect } from "next/navigation";
 import { prisma } from "@/lib/db";
 import { requireRole } from "@/lib/auth/require";
 import { CompanyDetail, parseCompanyTab } from "@/components/company/company-detail";
@@ -13,15 +14,15 @@ export default async function StaffCompanyPage(props: PageProps<"/staff/companie
   const viewer = await requireRole("ADMIN", "STAFF");
   const { id } = await props.params;
   const sp = await props.searchParams;
-  const tab = sp.request ? "requests" : parseCompanyTab(sp.tab);
+  // Older links opened a request in a dialog on this page; requests now have their own page.
+  if (typeof sp.request === "string") redirect(`/staff/requests/${sp.request}`);
+  const tab = parseCompanyTab(sp.tab);
   return (
     <CompanyDetail
       companyId={id}
       tab={tab}
       viewer={viewer}
       basePath={`/staff/companies/${id}`}
-      requestsBasePath={`/staff/companies/${id}`}
-      openRequestId={typeof sp.request === "string" ? sp.request : undefined}
     />
   );
 }

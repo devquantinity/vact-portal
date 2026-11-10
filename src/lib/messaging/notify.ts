@@ -22,8 +22,8 @@ export function requestLink(requestId: string): string {
   return `${appUrl()}/login?next=${encodeURIComponent(`/client/requests/${requestId}`)}`;
 }
 
-export function staffRequestLink(companyId: string, requestId: string): string {
-  return `${appUrl()}/login?next=${encodeURIComponent(`/staff/companies/${companyId}?request=${requestId}`)}`;
+export function staffRequestLink(requestId: string): string {
+  return `${appUrl()}/login?next=${encodeURIComponent(`/staff/requests/${requestId}`)}`;
 }
 
 /**

@@ -12,7 +12,7 @@ import { LinkTabs } from "@/components/shared/link-tabs";
 import { RequestStatusBadge } from "@/components/shared/status-badge";
 import { Card } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
-import { RequestTabs } from "@/components/requests/request-panel";
+import { RequestView } from "@/components/requests/request-view";
 
 export const metadata: Metadata = { title: "Review queue" };
 
@@ -131,7 +131,7 @@ export default async function ReviewsPage(props: PageProps<"/staff/reviews">) {
                 </p>
               </div>
               <div className="px-5 py-5 sm:px-6">
-                <RequestTabs key={selected.id} request={selected} afterReviewHref={afterReviewHref} />
+                <RequestView key={selected.id} request={selected} afterReviewHref={afterReviewHref} />
               </div>
             </Card>
           ) : (

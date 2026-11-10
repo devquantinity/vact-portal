@@ -80,7 +80,7 @@ export function RequestsCard({
                     {showOfficer ? <TableCell className="text-sm">{r.company.assignedStaff?.name ?? <span className="text-muted-foreground">Unassigned</span>}</TableCell> : null}
                     <TableCell>
                       <Button asChild variant="ghost" size="sm">
-                        <Link href={`/staff/companies/${r.company.id}?request=${r.id}`}>Open</Link>
+                        <Link href={`/staff/requests/${r.id}`}>Open</Link>
                       </Button>
                     </TableCell>
                   </TableRow>
@@ -194,7 +194,7 @@ export function EscalationsCard({ rows, now, showOfficer }: { rows: EscalationRo
                   <TableCell>
                     <div className="flex gap-1">
                       <Button asChild variant="ghost" size="sm">
-                        <Link href={`/staff/companies/${e.request.company.id}?request=${e.request.id}`}>Open</Link>
+                        <Link href={`/staff/requests/${e.request.id}`}>Open</Link>
                       </Button>
                       <AcknowledgeEscalationButton id={e.id} />
                     </div>
