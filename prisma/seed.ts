@@ -26,6 +26,8 @@ const APP_URL = (process.env.APP_URL ?? "http://localhost:3000").replace(/\/$/, 
 const DEMO_PHONE = process.env.SEED_DEMO_PHONE || "+60123456789";
 // Demo logins come from .env so the same seed works with real addresses on demo day.
 const PASSWORD = process.env.SEED_PASSWORD || "Demo1234!";
+// Hosted config can hold an argon2 hash of that password instead of the plaintext (pnpm db:hash-password).
+const PASSWORD_HASH = process.env.SEED_PASSWORD_HASH || null;
 const ADMIN_EMAIL = (process.env.SEED_ADMIN_EMAIL || "admin@vact.demo").trim().toLowerCase();
 const STAFF_DOMAIN = ADMIN_EMAIL.split("@")[1] || "vact.demo";
 const DEMO_EMAIL = (process.env.SEED_DEMO_EMAIL || "client@vact.demo").trim().toLowerCase();
@@ -136,7 +138,7 @@ function statusTimestamps(status: MessageStatus, sentAt: Date) {
 
 async function main() {
   const started = Date.now();
-  const passwordHash = await hash(PASSWORD, { memoryCost: 19456, timeCost: 2, parallelism: 1 });
+  const passwordHash = PASSWORD_HASH ?? (await hash(PASSWORD, { memoryCost: 19456, timeCost: 2, parallelism: 1 }));
 
   // --- Settings -------------------------------------------------------------------------------
   for (const [key, value] of Object.entries(DEFAULT_SETTINGS)) {
@@ -513,7 +515,7 @@ async function main() {
       `Seeded ${COMPANIES.length} companies, ${COMPANIES.length + 1} clients, ${REQUESTS.length} requests,`,
       `${jobCount} reminder jobs, ${messageCount} messages, ${escalationCount} escalations, ${fileCount} files (${storageDriver()} storage), ${audits.length} audit rows`,
       `in ${Date.now() - started}ms.`,
-      `Logins: admin ${ADMIN_EMAIL}, staff aisyah@${STAFF_DOMAIN} and daniel@${STAFF_DOMAIN}, demo client ${DEMO_EMAIL} (WhatsApp ${DEMO_PHONE}); password ${process.env.VERCEL ? "from SEED_PASSWORD" : PASSWORD}.`,
+      `Logins: admin ${ADMIN_EMAIL}, staff aisyah@${STAFF_DOMAIN} and daniel@${STAFF_DOMAIN}, demo client ${DEMO_EMAIL} (WhatsApp ${DEMO_PHONE}); password ${PASSWORD_HASH ? "as hashed in SEED_PASSWORD_HASH" : process.env.VERCEL ? "from SEED_PASSWORD" : PASSWORD}.`,
     ].join(" "),
   );
 }

@@ -158,7 +158,8 @@ automatically when `BLOB_READ_WRITE_TOKEN` is set), and a **Vercel Schedule** ca
 3. **Storage → Create → Blob**, access **private**, and tick *add a read-write token* so `BLOB_READ_WRITE_TOKEN` is set.
 4. **Settings → Environment Variables** (Production): `SESSION_SECRET`, `CRON_SECRET` (Vercel sends it as the bearer
    token on scheduled calls), `APP_URL=https://<project>.vercel.app`, `MAX_UPLOAD_MB=4`, the `SEED_*` logins you
-   want (`SEED_PASSWORD`, `SEED_ADMIN_EMAIL`, `SEED_DEMO_EMAIL`, `SEED_DEMO_PHONE`), and optionally `EMAIL_FROM`,
+   want (`SEED_ADMIN_EMAIL`, `SEED_DEMO_EMAIL`, `SEED_DEMO_PHONE`, and `SEED_PASSWORD_HASH` — the output of
+   `pnpm db:hash-password` on the Mac, so the plaintext demo password never sits in hosted config), and optionally `EMAIL_FROM`,
    `RESEND_API_KEY` and the `WHATSAPP_*` values.
 5. Deploy (push to `main`, or **Redeploy** after adding variables). The build applies the migrations and, when the
    database has no users yet, runs the seed (`pnpm db:seed:if-empty`; sample files go into Blob). Later builds

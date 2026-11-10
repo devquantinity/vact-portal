@@ -33,6 +33,7 @@ const schema = z.object({
   RESEND_WEBHOOK_SECRET: z.string().default(""),
 
   SEED_PASSWORD: z.string().default("Demo1234!"),
+  SEED_PASSWORD_HASH: z.string().optional(),
   SEED_ADMIN_EMAIL: z.string().default("admin@vact.demo"),
   SEED_DEMO_PHONE: z.string().default("+60123456789"),
   SEED_DEMO_EMAIL: z.string().default("client@vact.demo"),
