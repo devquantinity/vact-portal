@@ -23,9 +23,9 @@ export function ClientShell({
           <UserMenu user={user} variant="light" />
         </div>
       </header>
-      <main className="mx-auto w-full max-w-5xl flex-1 px-4 py-6 sm:px-6 sm:py-8">{children}</main>
+      <main className="mx-auto w-full max-w-5xl flex-1 px-5 py-8 sm:px-8 sm:py-14">{children}</main>
       <footer className="border-t bg-card">
-        <div className="mx-auto w-full max-w-5xl px-4 py-5 text-xs text-muted-foreground sm:px-6 space-y-1">
+        <div className="mx-auto w-full max-w-5xl px-5 py-8 text-xs text-muted-foreground sm:px-8 space-y-1.5">
           <p className="font-medium text-foreground">{FIRM.name}</p>
           <p>
             Questions about a request? Call {FIRM.phone} or WhatsApp {FIRM.whatsapp}.

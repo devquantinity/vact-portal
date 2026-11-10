@@ -44,12 +44,12 @@ export default async function ClientHomePage(props: PageProps<"/client">) {
   const waPhone = officer?.phone ? officer.phone.replace(/^\+/, "") : null;
 
   return (
-    <div className="space-y-8">
+    <div className="space-y-12 sm:space-y-16">
       {/* Header: greeting + company on the left, progress on the right */}
       <section className="overflow-hidden rounded-2xl border bg-card shadow-xs">
-        <div className="grid gap-6 p-5 sm:p-7 lg:grid-cols-[minmax(0,1fr)_auto] lg:items-center">
-          <div className="space-y-4">
-            <div className="space-y-1">
+        <div className="grid gap-8 p-6 sm:p-10 lg:grid-cols-[minmax(0,1fr)_auto] lg:items-center lg:gap-12">
+          <div className="space-y-6">
+            <div className="space-y-2">
               <p className="text-sm font-medium text-muted-foreground">{greeting(new Date())}</p>
               <h1 className="font-display text-3xl font-bold tracking-tight sm:text-4xl">Hello, {firstName}</h1>
             </div>
@@ -73,13 +73,13 @@ export default async function ClientHomePage(props: PageProps<"/client">) {
           </div>
 
           {total > 0 ? (
-            <div className="flex items-center gap-5 rounded-xl border bg-background/60 p-4 sm:gap-6 sm:p-5 lg:min-w-[320px]">
+            <div className="flex items-center gap-6 rounded-xl border bg-background/60 p-6 sm:gap-8 sm:p-7 lg:min-w-[340px]">
               <ProgressRing approved={done.length} total={total} />
-              <div className="min-w-0 flex-1 space-y-2.5">
+              <div className="min-w-0 flex-1 space-y-3">
                 <p className="font-display text-lg font-semibold leading-tight tracking-tight">
                   {done.length} of {total} approved
                 </p>
-                <ul className="space-y-1.5 text-sm">
+                <ul className="space-y-2 text-sm">
                   <Stat dot="bg-red-500" label="Overdue" value={overdue.length} muted={overdue.length === 0} />
                   <Stat dot="bg-sky-500" label="Waiting for you" value={action.length - overdue.length + changes.length} muted={action.length - overdue.length + changes.length === 0} />
                   <Stat dot="bg-amber-400" label="With V ACT" value={waiting.length} muted={waiting.length === 0} />
@@ -104,7 +104,7 @@ export default async function ClientHomePage(props: PageProps<"/client">) {
               <ClientRequestCard key={r.id} r={r} />
             ))}
           </Section>
-          <div className={cn("grid gap-8", waiting.length && done.length ? "lg:grid-cols-2" : "")}>
+          <div className={cn("grid gap-12 sm:gap-16", waiting.length && done.length ? "lg:grid-cols-2 lg:gap-10" : "")}>
             <Section icon={Hourglass} title="Waiting for V ACT" count={waiting.length} tone="text-amber-600" hideWhenEmpty>
               {waiting.map((r) => (
                 <ClientRequestCard key={r.id} r={r} />
@@ -120,9 +120,9 @@ export default async function ClientHomePage(props: PageProps<"/client">) {
       )}
 
       {/* Officer contact */}
-      <section className="flex flex-col gap-3 rounded-2xl border bg-card p-4 shadow-xs sm:flex-row sm:items-center sm:justify-between sm:p-5">
+      <section className="flex flex-col gap-4 rounded-2xl border bg-card p-6 shadow-xs sm:flex-row sm:items-center sm:justify-between sm:p-7">
         <div className="flex items-center gap-3">
-          <span className="flex size-10 items-center justify-center rounded-full bg-navy font-display text-sm font-semibold text-white">
+          <span className="flex size-11 items-center justify-center rounded-full bg-navy font-display text-sm font-semibold text-white">
             {initials(officer?.name ?? "V ACT")}
           </span>
           <div>
@@ -183,15 +183,15 @@ function Section({
 }) {
   if (count === 0 && hideWhenEmpty) return null;
   return (
-    <section className="space-y-3">
-      <h2 className="flex items-center gap-2 font-display text-base font-semibold tracking-tight">
+    <section className="space-y-5">
+      <h2 className="flex items-center gap-2.5 font-display text-lg font-semibold tracking-tight">
         <Icon className={`size-4 ${tone}`} /> {title}
         <span className="rounded-full bg-muted px-2 py-0.5 text-xs tabular-nums text-muted-foreground">{count}</span>
       </h2>
       {count === 0 ? (
-        <p className="rounded-xl border border-dashed bg-card/60 px-4 py-6 text-center text-sm text-muted-foreground">{empty}</p>
+        <p className="rounded-xl border border-dashed bg-card/60 px-4 py-8 text-center text-sm text-muted-foreground">{empty}</p>
       ) : (
-        <div className="space-y-2.5">{children}</div>
+        <div className="space-y-4">{children}</div>
       )}
     </section>
   );

@@ -42,17 +42,17 @@ export function ClientRequestCard({ r }: { r: ClientRequestRow }) {
     <Link
       href={href}
       className={cn(
-        "group flex items-center gap-3 rounded-xl border border-l-4 bg-card py-3.5 pl-3.5 pr-3 shadow-xs transition-all hover:-translate-y-px hover:border-primary/50 hover:shadow-sm active:translate-y-0 sm:gap-4 sm:py-4 sm:pl-4 sm:pr-4",
+        "group flex items-center gap-4 rounded-xl border border-l-[3px] bg-card py-5 pl-5 pr-4 shadow-xs transition-shadow hover:shadow-md sm:gap-6 sm:py-6 sm:pl-7 sm:pr-6",
         accent,
         r.overdue && "bg-red-50/30",
       )}
     >
-      <span className={cn("hidden size-10 shrink-0 items-center justify-center rounded-lg sm:flex", iconTone)}>
+      <span className={cn("hidden size-11 shrink-0 items-center justify-center rounded-xl sm:flex", iconTone)}>
         <Icon className="size-5" />
       </span>
 
-      <div className="min-w-0 flex-1 space-y-1">
-        <div className="flex flex-wrap items-center gap-x-2 gap-y-1">
+      <div className="min-w-0 flex-1 space-y-2">
+        <div className="flex flex-wrap items-center gap-x-3 gap-y-1.5">
           <p className="font-display text-[15px] font-semibold leading-tight tracking-tight sm:text-base">{r.documentType}</p>
           <RequestStatusBadge status={r.status} overdue={r.overdue} />
         </div>
