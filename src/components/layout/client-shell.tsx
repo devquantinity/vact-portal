@@ -15,7 +15,7 @@ export function ClientShell({
   return (
     <div className="flex min-h-screen flex-col">
       <header className="sticky top-0 z-20 bg-navy text-white">
-        <div className="mx-auto flex h-14 w-full max-w-4xl items-center justify-between px-4 sm:px-6">
+        <div className="mx-auto flex h-14 w-full max-w-5xl items-center justify-between px-4 sm:px-6">
           <Link href="/client" className="flex items-center gap-3">
             <Logo />
             <span className="hidden sm:inline text-sm font-semibold">{brandName}</span>
@@ -23,9 +23,9 @@ export function ClientShell({
           <UserMenu user={user} variant="light" />
         </div>
       </header>
-      <main className="mx-auto w-full max-w-4xl flex-1 px-4 py-6 sm:px-6 sm:py-8">{children}</main>
+      <main className="mx-auto w-full max-w-5xl flex-1 px-4 py-6 sm:px-6 sm:py-8">{children}</main>
       <footer className="border-t bg-card">
-        <div className="mx-auto w-full max-w-4xl px-4 py-5 text-xs text-muted-foreground sm:px-6 space-y-1">
+        <div className="mx-auto w-full max-w-5xl px-4 py-5 text-xs text-muted-foreground sm:px-6 space-y-1">
           <p className="font-medium text-foreground">{FIRM.name}</p>
           <p>
             Questions about a request? Call {FIRM.phone} or WhatsApp {FIRM.whatsapp}.

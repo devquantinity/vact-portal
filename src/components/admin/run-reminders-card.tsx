@@ -61,7 +61,7 @@ export function RunRemindersCard({ lastTick, workerAlive }: { lastTick: string |
 function Stat({ label, value, tone }: { label: string; value: number; tone: string }) {
   return (
     <div className="rounded-md border px-2 py-2">
-      <p className={`text-xl font-semibold tabular-nums ${tone}`}>{value}</p>
+      <p className={`font-display text-xl font-bold tabular-nums ${tone}`}>{value}</p>
       <p className="text-xs text-muted-foreground">{label}</p>
     </div>
   );

@@ -11,7 +11,7 @@ function Metric({ label, value, hint, icon: Icon, tone, href }: { label: string;
         <Icon className="size-4" />
       </span>
       <div className="min-w-0">
-        <p className="text-2xl font-semibold leading-none tabular-nums">{value}</p>
+        <p className="font-display text-2xl font-bold leading-none tabular-nums">{value}</p>
         <p className="mt-1.5 text-sm font-medium">{label}</p>
         {hint ? <p className="text-xs text-muted-foreground">{hint}</p> : null}
       </div>
