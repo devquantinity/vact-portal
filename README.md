@@ -142,6 +142,33 @@ see the two options below.
 read ticks from the simulator. Switch to `live` for one real message to prove the API works; that row stays at *Sent*
 (no receipts can reach the laptop), which is honest and easy to explain.
 
+## Hosting on Vercel (demo URL)
+
+Apart from Postgres and file storage the app is stateless, so it runs on Vercel with two swaps that are already in
+the code: a private **Vercel Blob** store replaces the local `uploads` folder (`STORAGE_DRIVER=blob`, picked
+automatically when `BLOB_READ_WRITE_TOKEN` is set), and **Vercel Cron** calls `GET /api/cron/tick` every minute
+instead of the worker process. `vercel.json` sets the Singapore region, the build command
+(`prisma migrate deploy && next build`) and the cron schedule.
+
+1. Push the repo to GitHub and import it in Vercel (**Add New → Project**). Framework preset Next.js, root `/`.
+2. Project → **Storage → Create Database → Neon** (Postgres, Singapore). Connecting it adds `DATABASE_URL`
+   (pooled, used by the app) and `DATABASE_URL_UNPOOLED` (used for migrations).
+3. **Storage → Create → Blob**, access **private**, and tick *add a read-write token* so `BLOB_READ_WRITE_TOKEN` is set.
+4. **Settings → Environment Variables** (Production): `SESSION_SECRET`, `CRON_SECRET` (Vercel sends it as the bearer
+   token on cron calls), `APP_URL=https://<project>.vercel.app`, `MAX_UPLOAD_MB=4`, `EMAIL_FROM`, `RESEND_API_KEY`,
+   the `WHATSAPP_*` values, and the `SEED_*` logins you want.
+5. Deploy (push to `main`, or **Redeploy** after adding variables). The build applies the migrations.
+6. Seed from the Mac, in the repo folder:
+   `pnpm dlx vercel env pull .env.production.local --environment production` then
+   `SEED_ENV_FILE=.env.production.local pnpm db:seed` (sample files go into Blob).
+7. Webhooks now have permanent URLs: Meta → `https://<project>.vercel.app/api/webhooks/whatsapp`,
+   Resend → `https://<project>.vercel.app/api/webhooks/resend`. No ngrok.
+
+Limits to know: Vercel functions accept request bodies up to 4.5 MB, hence `MAX_UPLOAD_MB=4` (the droplet build has
+no such cap; direct-to-Blob uploads lift it later). Per-minute cron needs the Pro plan; on Hobby set the schedule in
+`vercel.json` to daily and let a free pinger such as cron-job.org call the tick URL every minute with
+`Authorization: Bearer <CRON_SECRET>`. The login rate limiter is per function instance.
+
 ## How the reminder engine works
 
 - `pnpm worker` runs `tick()` every 60 seconds; **Admin → Settings → Run reminders now** runs the same code on demand

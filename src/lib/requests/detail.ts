@@ -2,6 +2,7 @@ import { prisma } from "@/lib/db";
 import { dateOnly, daysLeft, formatDateTime, formatDueDate, isOverdue } from "@/lib/dates";
 import { signedFileUrl } from "@/lib/files/signed-url";
 import { formatPhone } from "@/lib/phone";
+import { effectiveMaxSizeMb } from "@/lib/files/limits";
 import type { MessageView } from "@/components/messages/message-timeline";
 
 export type DocumentView = {
@@ -86,7 +87,7 @@ export async function loadRequestDetail(requestId: string, viewerId: string, now
       name: r.documentType.name,
       description: r.documentType.description,
       acceptedExtensions: r.documentType.acceptedExtensions,
-      maxSizeMb: r.documentType.maxSizeMb,
+      maxSizeMb: effectiveMaxSizeMb(r.documentType.maxSizeMb),
       allowMultipleFiles: r.documentType.allowMultipleFiles,
     },
     reminderType: {

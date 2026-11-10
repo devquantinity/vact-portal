@@ -1,6 +1,4 @@
-import "dotenv/config";
-import { mkdir, writeFile } from "node:fs/promises";
-import path from "node:path";
+import "./load-env";
 import { PrismaPg } from "@prisma/adapter-pg";
 import { hash } from "@node-rs/argon2";
 import { PrismaClient } from "../src/generated/prisma/client";
@@ -13,6 +11,7 @@ import { composeTemplateMessage } from "../src/lib/messaging/whatsapp";
 import { renderTemplate } from "../src/lib/templates/render";
 import { FIRM_NAME } from "../src/lib/env";
 import { formatPhone } from "../src/lib/phone";
+import { storage, storageDriver } from "../src/lib/storage";
 import { DOCUMENT_TYPES, REMINDER_TYPES } from "./seed-data";
 import { sampleJpg, samplePdf } from "./seed-files";
 
@@ -24,7 +23,6 @@ const day = (offset: number) => addDaysToDateString(TODAY, offset);
 const at = (offset: number, time = "09:00") => atMytTime(day(offset), time);
 const minutesAfter = (d: Date, m: number) => new Date(d.getTime() + m * 60_000);
 const APP_URL = (process.env.APP_URL ?? "http://localhost:3000").replace(/\/$/, "");
-const UPLOAD_DIR = path.resolve(process.cwd(), process.env.UPLOAD_DIR ?? "./uploads");
 const DEMO_PHONE = process.env.SEED_DEMO_PHONE || "+60123456789";
 // Demo logins come from .env so the same seed works with real addresses on demo day.
 const PASSWORD = process.env.SEED_PASSWORD || "Demo1234!";
@@ -451,9 +449,7 @@ async function main() {
                 ],
               })
             : await sampleJpg({ title: docType.name, company: company.name });
-        const full = path.join(UPLOAD_DIR, key);
-        await mkdir(path.dirname(full), { recursive: true });
-        await writeFile(full, bytes);
+        await storage().put(key, bytes, file.kind === "pdf" ? "application/pdf" : "image/jpeg");
         fileCount += 1;
         await prisma.document.create({
           data: {
@@ -515,7 +511,7 @@ async function main() {
   console.log(
     [
       `Seeded ${COMPANIES.length} companies, ${COMPANIES.length + 1} clients, ${REQUESTS.length} requests,`,
-      `${jobCount} reminder jobs, ${messageCount} messages, ${escalationCount} escalations, ${fileCount} files, ${audits.length} audit rows`,
+      `${jobCount} reminder jobs, ${messageCount} messages, ${escalationCount} escalations, ${fileCount} files (${storageDriver()} storage), ${audits.length} audit rows`,
       `in ${Date.now() - started}ms.`,
       `Logins: admin ${ADMIN_EMAIL}, staff aisyah@${STAFF_DOMAIN} and daniel@${STAFF_DOMAIN}, demo client ${DEMO_EMAIL} (WhatsApp ${DEMO_PHONE}); password ${PASSWORD}.`,
     ].join(" "),

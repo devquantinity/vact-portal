@@ -5,6 +5,7 @@ import { dateOnlyToDb } from "@/lib/dates";
 import { generateSchedule } from "@/lib/reminders/schedule";
 import { storage } from "@/lib/storage";
 import { validateAndPrepare } from "@/lib/files/validate";
+import { effectiveMaxSizeMb } from "@/lib/files/limits";
 import { notifyApproved, notifyChangesRequested, notifyNewRequest, notifyUploadReceived } from "@/lib/messaging/request-notify";
 
 /** Cancels every SCHEDULED reminder job for a request. Called whenever the request leaves PENDING. */
@@ -78,9 +79,10 @@ export async function recordUpload(params: {
     throw new Error(`${request.documentType.name} accepts one file per upload.`);
   }
 
+  const rule = { acceptedExtensions: request.documentType.acceptedExtensions, maxSizeMb: effectiveMaxSizeMb(request.documentType.maxSizeMb) };
   const prepared = [];
   for (const file of params.files) {
-    prepared.push(await validateAndPrepare(file, request.documentType));
+    prepared.push(await validateAndPrepare(file, rule));
   }
 
   let version = request.documents.reduce((max, d) => Math.max(max, d.version), 0);

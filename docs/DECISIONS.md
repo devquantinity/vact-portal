@@ -26,3 +26,4 @@ Small choices made while building, where the spec left room. Larger questions we
 | 20 | `User.notificationEmail` added (seed only) | The demo login must stay `client@vact.demo` while live emails need to reach the developer's real inbox (Resend's test sender only delivers to the account owner). All sending goes through `emailFor(user)`. |
 | 21 | Seed data is relative to today | `pnpm db:reset` on any day gives the same picture: overdue by 3–20 days, due in 3–30 days, two jobs due one minute ago. |
 | 22 | `ALLOWED_DEV_ORIGINS` env for `allowedDevOrigins` | Next 16 blocks cross-origin dev requests; needed to open the dev server from a phone on the LAN or through ngrok. |
+| 23 | Vercel hosting: private Vercel Blob via the storage adapter, cron `GET /api/cron/tick` instead of the worker, `MAX_UPLOAD_MB` cap | Irfan chose Vercel (dev quantinity) for the demo URL on 10 Nov 2026. The droplet plan in the spec still works unchanged; nothing assumes Vercel. |

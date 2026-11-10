@@ -10,6 +10,9 @@ const schema = z.object({
   APP_URL: z.string().url().default("http://localhost:3000"),
   SESSION_SECRET: z.string().min(32),
   UPLOAD_DIR: z.string().default("./uploads"),
+  STORAGE_DRIVER: z.enum(["local", "blob"]).optional(),
+  BLOB_READ_WRITE_TOKEN: z.string().default(""),
+  MAX_UPLOAD_MB: z.coerce.number().int().positive().optional(),
   CRON_SECRET: z.string().default(""),
 
   WHATSAPP_MODE: z.enum(["live", "simulate"]).default("simulate"),

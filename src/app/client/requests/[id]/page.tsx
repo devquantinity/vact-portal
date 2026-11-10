@@ -6,6 +6,7 @@ import { prisma } from "@/lib/db";
 import { requireRole, canAccessCompany } from "@/lib/auth/require";
 import { daysLeft, describeDaysLeft, formatDateTime, formatDueDate, isOverdue } from "@/lib/dates";
 import { signedFileUrl } from "@/lib/files/signed-url";
+import { effectiveMaxSizeMb } from "@/lib/files/limits";
 import { formatBytes } from "@/lib/utils";
 import { formatPhone } from "@/lib/phone";
 import { Button } from "@/components/ui/button";
@@ -103,7 +104,7 @@ export default async function ClientRequestPage(props: PageProps<"/client/reques
           <FileUploader
             requestId={r.id}
             acceptedExtensions={r.documentType.acceptedExtensions}
-            maxSizeMb={r.documentType.maxSizeMb}
+            maxSizeMb={effectiveMaxSizeMb(r.documentType.maxSizeMb)}
             multiple={r.documentType.allowMultipleFiles}
           />
         </section>
