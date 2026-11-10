@@ -102,7 +102,7 @@ you if you do not have one):
      ```
 
    - Sample values when asked: `Hafiz`, `Bank statements for Hafiz Trading Sdn Bhd are due on 25 Nov 2026 (3 days left).`,
-     `https://portal.v-act.com.my/login`
+     `https://vact-portal.vercel.app/login`
    - Submit. **The template must be approved before live sending works** (usually minutes, sometimes hours).
      Parameter 1 is the client name, 2 is the reminder type's rendered body collapsed to one line (Meta allows no
      newlines, tabs or more than 4 spaces in a row, and caps the whole body at 1,024 characters, so long bodies are

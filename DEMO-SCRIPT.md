@@ -105,9 +105,12 @@ you set.
   asked.
 - *What if the number is wrong?* Puncak Hijau: the failed message shows Meta's reason, and the escalation told Daniel
   to call.
-- *Who sends the WhatsApp?* V ACT's own verified business number after approval; today it is the Meta test number.
-- *What happens next?* Hosting on a Singapore droplet under `portal.v-act.com.my`, V ACT's own WhatsApp number and
-  email domain, import of the real client list. All provider settings are already environment variables.
+- *Who sends the WhatsApp?* For the demo, messages are simulated (the delivery log shows sent, delivered and read).
+  For real use it is V ACT's own WhatsApp Business number on Meta's Cloud API, with the `vact_reminder` template approved.
+- *What about public holidays?* Reminders skip weekends and Kuala Lumpur public holidays (Settings has the list, editable
+  when the Islamic dates are announced).
+- *What happens next?* The demo runs at `vact-portal.vercel.app`. For real use: V ACT's own domain, WhatsApp number and
+  email domain, and import of the real client list. All provider settings are already environment variables.
 
 ## Reset between rehearsals
 

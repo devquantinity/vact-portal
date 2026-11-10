@@ -2,7 +2,7 @@ import type { Metadata } from "next";
 import { Building2, CheckCircle2, FolderOpen, Hourglass, MessageSquareWarning, Phone, TriangleAlert } from "lucide-react";
 import { requireRole } from "@/lib/auth/require";
 import { clientCompanies, clientRequestsFor } from "@/lib/requests/client-queries";
-import { formatPhone } from "@/lib/phone";
+import { getSettings } from "@/lib/settings";
 import { cn, initials } from "@/lib/utils";
 import { EmptyState } from "@/components/shared/empty-state";
 import { ClientRequestCard } from "@/components/client/request-card";
@@ -41,7 +41,9 @@ export default async function ClientHomePage(props: PageProps<"/client">) {
   const total = requests.length;
   const firstName = me.name.split(" ")[0];
   const officer = current.assignedStaff;
-  const waPhone = officer?.phone ? officer.phone.replace(/^\+/, "") : null;
+  const settings = await getSettings();
+  const telHref = `tel:${settings.staffPhone.replace(/[^\d+]/g, "")}`;
+  const waDigits = settings.officeWhatsapp.replace(/\D/g, "");
 
   return (
     <div className="space-y-12 sm:space-y-16">
@@ -130,14 +132,16 @@ export default async function ClientHomePage(props: PageProps<"/client">) {
             <p className="text-xs text-muted-foreground">Your V ACT officer for {current.name}</p>
           </div>
         </div>
-        {officer?.phone ? (
+        {settings.staffPhone || waDigits ? (
           <div className="flex flex-wrap gap-2">
-            <a href={`tel:${officer.phone}`} className="inline-flex items-center gap-1.5 rounded-md border px-3 py-1.5 text-sm font-medium hover:bg-accent">
-              <Phone className="size-4" /> {formatPhone(officer.phone)}
-            </a>
-            {waPhone ? (
+            {settings.staffPhone ? (
+              <a href={telHref} className="inline-flex items-center gap-1.5 rounded-md border px-3 py-1.5 text-sm font-medium hover:bg-accent">
+                <Phone className="size-4" /> {settings.staffPhone}
+              </a>
+            ) : null}
+            {waDigits ? (
               <a
-                href={`https://wa.me/${waPhone}`}
+                href={`https://wa.me/${waDigits}`}
                 target="_blank"
                 rel="noreferrer"
                 className="inline-flex items-center gap-1.5 rounded-md bg-emerald-600 px-3 py-1.5 text-sm font-medium text-white hover:bg-emerald-700"

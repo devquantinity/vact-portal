@@ -108,7 +108,7 @@ export async function sendTestMessageAction(
     client_name: actor.name,
     link: `${appUrl()}/login`,
     staff_name: actor.name,
-    staff_phone: actor.phone ?? settings.staffPhone,
+    staff_phone: settings.staffPhone,
     firm: FIRM_NAME,
   });
   const results: { whatsapp?: string; email?: string } = {};

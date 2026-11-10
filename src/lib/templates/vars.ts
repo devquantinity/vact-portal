@@ -1,6 +1,5 @@
 import { daysLeft, describeDaysLeft, formatDueDate } from "@/lib/dates";
 import { FIRM_NAME } from "@/lib/env";
-import { formatPhone } from "@/lib/phone";
 import type { AppSettings } from "@/lib/settings";
 import type { TemplateVars } from "./render";
 
@@ -32,7 +31,8 @@ export function buildTemplateVars(params: {
     days_left: describeDaysLeft(daysLeft(request.dueDate, now)),
     link,
     staff_name: staff?.name ?? "your V ACT officer",
-    staff_phone: staff?.phone ? formatPhone(staff.phone) : settings.staffPhone,
+    // Clients are given the office line, not an officer's own mobile.
+    staff_phone: settings.staffPhone,
     firm: FIRM_NAME,
   };
 }

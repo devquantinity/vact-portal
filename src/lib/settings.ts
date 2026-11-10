@@ -1,13 +1,17 @@
 import { prisma, type Prisma } from "@/lib/db";
 import { env, FIRM_SHORT, TIMEZONE } from "@/lib/env";
+import { DEFAULT_PUBLIC_HOLIDAYS } from "@/lib/reminders/holidays";
 
 export type AppSettings = {
   brandName: string;
   sendWindowStart: string; // "HH:mm" in Asia/Kuala_Lumpur
   sendWindowEnd: string; // "HH:mm"
   skipWeekends: boolean;
+  skipPublicHolidays: boolean;
+  publicHolidays: string; // one "yyyy-MM-dd Name" per line (Kuala Lumpur)
   timezone: string;
-  staffPhone: string; // shown to clients as the contact number ({staff_phone} fallback)
+  staffPhone: string; // office line clients call, and {staff_phone} in messages
+  officeWhatsapp: string; // number behind the client's WhatsApp button
 };
 
 export const DEFAULT_SETTINGS: AppSettings = {
@@ -15,8 +19,12 @@ export const DEFAULT_SETTINGS: AppSettings = {
   sendWindowStart: "09:00",
   sendWindowEnd: "18:00",
   skipWeekends: true,
+  skipPublicHolidays: true,
+  publicHolidays: DEFAULT_PUBLIC_HOLIDAYS,
   timezone: TIMEZONE,
-  staffPhone: "+60 3-0000 0000",
+  // V ACT office line and WhatsApp number, as listed on www.v-act.com.my.
+  staffPhone: "+603-2011 8002",
+  officeWhatsapp: "+6013-279 5163",
 };
 
 const KEYS = Object.keys(DEFAULT_SETTINGS) as (keyof AppSettings)[];
@@ -27,8 +35,8 @@ export async function getSettings(): Promise<AppSettings> {
   for (const row of rows) {
     const key = row.key as keyof AppSettings;
     const value = row.value as unknown;
-    if (key === "skipWeekends") {
-      out.skipWeekends = Boolean(value);
+    if (key === "skipWeekends" || key === "skipPublicHolidays") {
+      out[key] = Boolean(value);
     } else if (typeof value === "string") {
       out[key] = value;
     }

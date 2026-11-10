@@ -102,7 +102,7 @@ export const REMINDER_TYPES: ReminderTypeSeed[] = [
       "The {document} for {company} is due on {due_date} ({days_left}). Late lodgement of the annual return attracts an SSM penalty, so please upload the information as soon as possible.",
     emailSubject: "Annual return for {company}: information needed by {due_date}",
     emailBody:
-      "Dear {client_name},\n\nThe annual return for {company} must be lodged with SSM within 30 days of the anniversary of incorporation. We need the following from you by {due_date} ({days_left}):\n\n{document}\n\nLate lodgement attracts a penalty from SSM under the Companies Act 2016, and repeated failures can lead to the company being struck off. Please upload the information through the portal using the button below.\n\nYour officer {staff_name} ({staff_phone}) is happy to help if anything is unclear.\n\nRegards,\n{firm}",
+      "Dear {client_name},\n\nThe annual return for {company} must be lodged with SSM within 30 days of the anniversary of incorporation. We need the following from you by {due_date} ({days_left}):\n\n{document}\n\nLate lodgement attracts a penalty from SSM. Please upload the information through the portal using the button below.\n\nYour officer {staff_name} ({staff_phone}) is happy to help if anything is unclear.\n\nRegards,\n{firm}",
   },
   {
     name: "Audited accounts",

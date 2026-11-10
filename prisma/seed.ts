@@ -283,7 +283,7 @@ async function main() {
       days_left: describeDaysLeft(daysLeft(due, when)),
       link: `${APP_URL}/login?next=${encodeURIComponent(`/client/requests/${req.id}`)}`,
       staff_name: company.staff.name,
-      staff_phone: company.staff.phone ? formatPhone(company.staff.phone) : DEFAULT_SETTINGS.staffPhone,
+      staff_phone: DEFAULT_SETTINGS.staffPhone,
       firm: FIRM_NAME,
     };
   }

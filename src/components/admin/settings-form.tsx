@@ -5,6 +5,7 @@ import { saveSettingsAction } from "@/actions/settings";
 import type { ActionState } from "@/lib/action-utils";
 import type { AppSettings } from "@/lib/settings";
 import { Input } from "@/components/ui/input";
+import { Textarea } from "@/components/ui/textarea";
 import { Switch } from "@/components/ui/switch";
 import { Field } from "@/components/forms/field";
 import { SubmitButton } from "@/components/shared/submit-button";
@@ -33,9 +34,31 @@ export function SettingsForm({ settings }: { settings: AppSettings }) {
         </div>
         <Switch name="skipWeekends" defaultChecked={settings.skipWeekends} />
       </div>
-      <Field label="Office phone shown to clients" htmlFor="staffPhone" error={errors.staffPhone} hint="Used for {staff_phone} when the assigned officer has no number.">
-        <Input id="staffPhone" name="staffPhone" defaultValue={settings.staffPhone} required />
-      </Field>
+      <div className="space-y-3 rounded-md border px-3 py-2">
+        <div className="flex items-center justify-between gap-3">
+          <div>
+            <p className="text-sm font-medium">Skip public holidays</p>
+            <p className="text-xs text-muted-foreground">Reminders due on a holiday below move to the next working day.</p>
+          </div>
+          <Switch name="skipPublicHolidays" defaultChecked={settings.skipPublicHolidays} />
+        </div>
+        <Field
+          label="Public holidays (Kuala Lumpur)"
+          htmlFor="publicHolidays"
+          error={errors.publicHolidays}
+          hint="One per line: date then name, e.g. 2027-03-10 Hari Raya Aidilfitri. Islamic dates depend on moon sighting; correct them here when announced."
+        >
+          <Textarea id="publicHolidays" name="publicHolidays" defaultValue={settings.publicHolidays} rows={8} className="font-mono text-xs" />
+        </Field>
+      </div>
+      <div className="grid gap-4 sm:grid-cols-2">
+        <Field label="Office phone shown to clients" htmlFor="staffPhone" error={errors.staffPhone} hint="The call button, and {staff_phone} in messages.">
+          <Input id="staffPhone" name="staffPhone" defaultValue={settings.staffPhone} required />
+        </Field>
+        <Field label="WhatsApp number shown to clients" htmlFor="officeWhatsapp" error={errors.officeWhatsapp} hint="The WhatsApp button on the client's page.">
+          <Input id="officeWhatsapp" name="officeWhatsapp" defaultValue={settings.officeWhatsapp} required />
+        </Field>
+      </div>
       <ActionFeedback state={state} />
       <div className="flex justify-end">
         <SubmitButton pendingText="Saving…">Save settings</SubmitButton>

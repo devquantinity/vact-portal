@@ -8,7 +8,7 @@ import { daysLeft, describeDaysLeft, formatDateTime, formatDueDate, isOverdue } 
 import { signedFileUrl } from "@/lib/files/signed-url";
 import { effectiveMaxSizeMb } from "@/lib/files/limits";
 import { formatBytes } from "@/lib/utils";
-import { formatPhone } from "@/lib/phone";
+import { getSettings } from "@/lib/settings";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { RequestStatusBadge, ReviewStatusBadge } from "@/components/shared/status-badge";
@@ -36,6 +36,7 @@ export default async function ClientRequestPage(props: PageProps<"/client/reques
   const canUpload = r.status === "PENDING" || r.status === "CHANGES_REQUESTED" || r.status === "UPLOADED";
   const latestChange = r.documents.find((d) => d.reviewStatus === "CHANGES_REQUESTED" && d.reviewComment);
   const officer = r.company.assignedStaff;
+  const settings = await getSettings();
 
   return (
     <div className="space-y-6">
@@ -140,7 +141,8 @@ export default async function ClientRequestPage(props: PageProps<"/client/reques
       ) : null}
 
       <p className="text-xs text-muted-foreground">
-        Questions? {officer ? `${officer.name}${officer.phone ? ` · ${formatPhone(officer.phone)}` : ""}` : "Call the V ACT office."}
+        Questions? Call the V ACT office on {settings.staffPhone} or WhatsApp {settings.officeWhatsapp}
+        {officer ? ` and ask for ${officer.name}` : ""}.
       </p>
     </div>
   );

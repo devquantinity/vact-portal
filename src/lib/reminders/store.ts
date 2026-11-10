@@ -2,12 +2,18 @@ import { prisma } from "@/lib/db";
 import { getSettings, setSetting } from "@/lib/settings";
 import { loadRequestForMessaging, notifyEscalation, sendTemplatedToContacts } from "@/lib/messaging/request-notify";
 import { STALE_LOCK_MS, type SendOutcome, type TickStore } from "./tick";
+import { holidayDates } from "./holidays";
 
 /** The production TickStore, backed by Prisma and the messaging layer. */
 export const prismaTickStore: TickStore = {
   async settings() {
     const s = await getSettings();
-    return { sendWindowStart: s.sendWindowStart, sendWindowEnd: s.sendWindowEnd, skipWeekends: s.skipWeekends };
+    return {
+      sendWindowStart: s.sendWindowStart,
+      sendWindowEnd: s.sendWindowEnd,
+      skipWeekends: s.skipWeekends,
+      holidays: s.skipPublicHolidays ? holidayDates(s.publicHolidays) : undefined,
+    };
   },
 
   async dueJobs(now) {
